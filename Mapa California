@@ -1,1 +1,18 @@
+import folium as fl
+
+# Crear un mapa centrado en las coordenadas dadas
+mapa = fl.Map(location=[-119.7512600, 37.2502200], zoom_start=4)
+
+# Iterar sobre las filas del DataFrame
+for index, fila in df_nuevo.iterrows():
+    nombre_estacion = fila['Station Name']  # Suponiendo que 'nombre_estacion' es el nombre de la columna en el DataFrame
+    longitud = float(fila['Longitude'])  # Suponiendo que 'longitud' es el nombre de la columna en el DataFrame
+    latitud = float(fila['Latitude'])  # Suponiendo que 'latitud' es el nombre de la columna en el DataFrame
+
+    # Crear un marcador en el mapa para cada estación
+    fl.Marker([latitud, longitud], popup=nombre_estacion).add_to(mapa)
+
+# Mostrar el mapa
+mapa
+
 
