@@ -1,0 +1,15 @@
+import streamlit as st
+from streamlit_folium import folium_static
+import folium
+
+def main():
+    st.title("Mapa Interactivo de Estados Unidos")
+
+    # Crear un objeto de mapa centrado en Estados Unidos
+    mapa = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
+
+    # Renderizar el mapa en Streamlit usando "folium_static"
+    folium_static(mapa)
+
+if __name__ == "__main__":
+    main()
