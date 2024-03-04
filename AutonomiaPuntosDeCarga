@@ -1,0 +1,82 @@
+import math
+
+# Función para calcular la distancia entre dos puntos en coordenadas geográficas (latitud, longitud)
+def haversine(lat1, lon1, lat2, lon2):
+    # Radio de la Tierra en kilómetros
+    R = 6371.0
+
+    # Convertir grados a radianes
+    lat1 = math.radians(lat1)
+    lon1 = math.radians(lon1)
+    lat2 = math.radians(lat2)
+    lon2 = math.radians(lon2)
+
+    # Diferencia de latitud y longitud
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # Fórmula de Haversine
+    a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+
+    # Distancia en kilómetros
+    distance = R * c
+    return distance
+
+# Coordenadas de carga desde la base de datos (simulado)
+coordenadas_carga = [
+    {"lat": 39.120988, "lon":-2.000053},
+    {"lat": 39.834823, "lon": -3.988696},
+    {"lat": 40.072501, "lon": -2.261998} 
+    # Agrega más coordenadas de carga si es necesario
+]
+
+# Función para moverse con una autonomía dada
+def mover_con_autonomia(lat_inicial, lon_inicial, autonomia, lat_destino, lon_destino):
+    distancia_total = haversine(lat_inicial, lon_inicial, lat_destino, lon_destino)
+    
+    if autonomia >= distancia_total:
+        print("Te llevó directamente al destino.")
+        return
+    
+    # Lista para almacenar la distancia recorrida
+    distancia_recorrida = 0
+    
+    # Iteramos mientras la autonomía no alcance el destino
+    while autonomia < distancia_total:
+        # Bandera para indicar si se realizó una recarga en esta iteración
+        recargado = False
+        
+        # Iteramos sobre las coordenadas de carga
+        for coordenada_carga in coordenadas_carga:
+            # Calculamos la distancia hasta la coordenada de carga
+            distancia_hasta_carga = haversine(lat_inicial, lon_inicial, coordenada_carga["lat"], coordenada_carga["lon"])
+            
+            # Si la autonomía alcanza hasta la coordenada de carga
+            if distancia_hasta_carga <= autonomia:
+                print(f"Recarga en ({coordenada_carga['lat']}, {coordenada_carga['lon']})")
+                autonomia += autonomia_total  # Recargar completamente
+                distancia_recorrida += distancia_hasta_carga
+                lat_inicial, lon_inicial = coordenada_carga["lat"], coordenada_carga["lon"]
+                recargado = True
+                break  # Salimos del bucle for
+        
+        # Si no se pudo recargar en ninguna coordenada, no hay suficiente autonomía para llegar al destino
+        if not recargado:
+            print("La autonomía no es suficiente para llegar al destino después de recargar en todas las coordenadas.")
+            return
+    
+    # Si alcanzamos el destino
+    print("Te llevó al destino después de recargar.")
+    print(f"Distancia total recorrida: {distancia_total} km.")
+    return
+
+# Coordenadas de ejemplo
+lat_inicial = 39.467394
+lon_inicial = -0.376075
+autonomia_total = 200  # Kilómetros
+lat_destino = 40.333808
+lon_destino =  -3.480844
+
+# Llamada a la función
+mover_con_autonomia(lat_inicial, lon_inicial, autonomia_total, lat_destino, lon_destino)
