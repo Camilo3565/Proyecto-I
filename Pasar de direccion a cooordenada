@@ -1,0 +1,32 @@
+pip install geopy
+from geopy.geocoders import Nominatim
+
+def direccion_a_coordenadas(direccion):
+    # Crear un objeto geocoder
+    geolocalizador = Nominatim(user_agent="my_geocoder")
+    
+    # Intentar geocodificar la dirección
+    try:
+        # Obtener las coordenadas de la dirección
+        ubicacion = geolocalizador.geocode(direccion)
+        
+        # Verificar si se encontraron las coordenadas
+        if ubicacion:
+            latitud = ubicacion.latitude
+            longitud = ubicacion.longitude
+            return latitud, longitud
+        else:
+            print("La dirección no pudo ser geocodificada.")
+            return None
+    except Exception as e:
+        print("Error:", e)
+        return None
+
+# Ejemplo de uso:
+
+direccion = input('Introduce tu dirección:')
+coordenadas = direccion_a_coordenadas(direccion)
+if coordenadas:
+    print("Coordenadas de la dirección '{}':".format(direccion))
+    print("Latitud:", coordenadas[0])
+    print("Longitud:", coordenadas[1])
