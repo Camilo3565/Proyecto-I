@@ -3,35 +3,6 @@ import pandas as pd
 from folium.plugins import MarkerCluster
 
 # Crear un objeto de mapa centrado en Estados Unidos
-mapa_usa = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
-
-# Crear un marker cluster
-marker_cluster = MarkerCluster().add_to(mapa_usa)
-
-# Cargar el archivo CSV con los datos de las estaciones de combustible alternativo
-df = pd.read_csv("alt_fuel_stations (Feb 22 2024).csv")
-
-# Filtrar las estaciones de combustible alternativo solo para el estado de Kansas
-df_nuevo = df.loc[(df["Fuel Type Code"] == "ELEC") & (df["State"].isin(["NY", "FL"]))]
-
-# Iterar sobre las filas del DataFrame
-for index, fila in df_nuevo.iterrows():
-    nombre_estacion = fila['Station Name']  
-    longitud = float(fila['Longitude'])  
-    latitud = float(fila['Latitude'])  
-
-    # Agregar un marcador para la estación en el cluster   
-    folium.Marker(location=[latitud, longitud], popup=nombre_estacion).add_to(marker_cluster)
-
-# Muestra el mapa
-mapa_usa
-
-
-import folium 
-import pandas as pd
-from folium.plugins import MarkerCluster
-
-# Crear un objeto de mapa centrado en Estados Unidos
 mapa = folium.Map(location=[37.0902, -95.7129], zoom_start=4)
 
 # Plugins de folium
