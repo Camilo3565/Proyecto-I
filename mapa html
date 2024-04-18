@@ -53,30 +53,23 @@
             attribution: '© OpenStreetMap contributors'
         }).addTo(map); // Añadimos la capa de teselas de OpenStreetMap al mapa
 
-        var routingControl = L.Routing.control({
-            routeWhileDragging: true,
-            show: true, // Mostrar los waypoints en el mapa
-            draggableWaypoints: true, // Habilitar la capacidad de arrastrar los waypoints
-            geocoder: L.Control.Geocoder.nominatim() // Usar el servicio de geocodificación de Nominatim
-        }).addTo(map); // Añadimos el control de enrutamiento al mapa
-
-        // Función para limpiar los marcadores y recalcular la ruta
-        function clearMarkersAndRoute() {
-            map.eachLayer(function (layer) {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
-            });
-            routingControl.setWaypoints([]);
+        function createButton(label, container) {
+            var btn = L.DomUtil.create('button', '', container);
+            btn.setAttribute('type', 'button');
+            btn.innerHTML = label;
+            return btn;
         }
 
-        // Función para eliminar las paradas dentro de la ruta principal
-        function removeStops() {
-            routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
-        }
+        var ReversablePlan = L.Routing.Plan.extend({
+            createGeocoders: function() {
+                var container = L.Routing.Plan.prototype.createGeocoders.call(this),
+                    reverseButton = createButton('↑↓', container);
 
-        document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
-        document.getElementById('removeStopsButton').addEventListener('click', removeStops);
-    </script>
-</body>
-</html>
+                L.DomEvent.on(reverseButton, 'click', function() {
+                    var waypoints = this.getWaypoints();
+                    this.setWaypoints(waypoints.reverse());
+                }, this);
+
+                return container;
+            }
+        });
