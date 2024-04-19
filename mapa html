@@ -73,3 +73,34 @@
                 return container;
             }
         });
+
+        var plan = new ReversablePlan([], {
+            geocoder: L.Control.Geocoder.nominatim(),
+            routeWhileDragging: true
+        });
+
+        var routingControl = L.Routing.control({
+            routeWhileDragging: true,
+            plan: plan
+        }).addTo(map); // Añadimos el control de enrutamiento al mapa
+
+        // Función para limpiar los marcadores y recalcular la ruta
+        function clearMarkersAndRoute() {
+            map.eachLayer(function (layer) {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+            routingControl.setWaypoints([]);
+        }
+
+        // Función para eliminar las paradas dentro de la ruta principal
+        function removeStops() {
+            routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
+        }
+
+        document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
+        document.getElementById('removeStopsButton').addEventListener('click', removeStops);
+    </script>
+</body>
+</html>
