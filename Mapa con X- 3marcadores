@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Leaflet Routing Machine Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+    <style>
+        #map {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .control-button {
+            position: absolute;
+            z-index: 1000;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .control-button:hover {
+            background-color: #0056b3;
+        }
+        #clearMarkersButton {
+            bottom: 70px;
+            left: 20px;
+            margin-bottom: 10px;
+        }
+        #removeStopsButton {
+            bottom: 20px;
+            left: 20px;
+            margin-bottom: 10px;
+        }
+        #changeAutonomyButton {
+            bottom: 120px;
+            left: 20px;
+            margin-bottom: 10px;
+        }
+        .x-marker {
+            color: black;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <button id="clearMarkersButton" class="control-button">Clear Markers</button>
+    <button id="removeStopsButton" class="control-button">Remove Stops</button>
+    <button id="changeAutonomyButton" class="control-button">Change Autonomy</button>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <script>
+        var map = L.map('map').setView([39.8283, -98.5795], 4); // Establecemos la vista del mapa en el centro de Estados Unidos
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map); // Añadimos la capa de teselas de OpenStreetMap al mapa
+
+        var markerCluster = L.markerClusterGroup(); // Crear grupo de marcadores
+
+        // Datos de ejemplo (reemplaza con tus datos reales)
+        var data = {
+            "data": [
+                {
+                    "Fuel Type Code": "ELEC",
+                    "Station Name": "LADWP - Truesdale Center",
+                    "Street Address": "11797 Truesdale St",
+                    "City": "Sun Valley",
+                    "State": "CA",
+                    "Country": "US",
+                    "Groups With Access Code": "Private",
+                    "EV Level1 EVSE Num": "null",
+                    "EV Level2 EVSE Num": 57.0,
+                    "EV DC Fast Count": 2.0,
+                    "Latitude": 34.2483191527193,
+                    "Longitude": -118.3879713743439
+                },
+                {
+                    "Fuel Type Code": "ELEC",
+                    "Station Name": "Los Angeles Convention Center",
+                    "Street Address": "1201 S Figueroa St",
+                    "City": "Los Angeles",
+                    "State": "CA",
+                    "Country": "US",
+                    "Groups With Access Code": "Public",
+                    "EV Level1 EVSE Num": "null",
+                    "EV Level2 EVSE Num": 7.0,
+                    "EV DC Fast Count": "null",
+                    "Latitude": 34.040539,
+                    "Longitude": -118.271387
+                },
+                {
+                    "Fuel Type Code": "ELEC",
+                    "Station Name": "LADWP - John Ferraro Building",
+                    "Street Address": "111 N Hope St",
+                    "City": "Los Angeles",
+                    "State": "CA",
+                    "Country": "US",
+                    "Groups With Access Code": "Private",
+                    "EV Level1 EVSE Num": "null",
+                    "EV Level2 EVSE Num": 338.0,
+                    "EV DC Fast Count": 12.0,
+                    "Latitude": 34.059133,
+                    "Longitude": -118.248589
+                },
+                {
+                    "Fuel Type Code": "ELEC",
+                    "Station Name": "LADWP - Haynes Power Plant",
+                    "Street Address": "6801 E 2nd St",
+                    "City": "Long Beach",
+                    "State": "CA",
+                    "Country": "US",
+                    "Groups With Access Code": "Private",
+                    "EV Level1 EVSE Num": "null",
+                    "EV Level2 EVSE Num": 19.0,
+                    "EV DC Fast Count": 1.0,
+                    "Latitude": 33.759802,
+                    "Longitude": -118.096665
+                },
+                {
+                    "Fuel Type Code": "ELEC",
+                    "Station Name": "LADWP - Harbor Generating Station",
+                    "Street Address": "161 N Island Ave",
+                    "City": "Wilmington",
+                    "State": "CA",
+                    "Country": "US",
+                    "Groups With Access Code": "Private",
+                    "EV Level1 EVSE Num": "null",
+                    "EV Level2 EVSE Num": 10.0,
+                    "EV DC Fast Count": "null",
+                    "Latitude": 33.770508,
+                    "Longitude": -118.265628
+                }
+ ]
+        }
+
+        var autonomyKm = 200; // Valor inicial de la autonomía del coche en kilómetros
+
+        function askAutonomy() {
+            var autonomy = prompt("Por favor, ingrese la autonomía del coche en kilómetros:");
+            if (autonomy !== null) {
+                autonomyKm = parseFloat(autonomy);
+                alert("Has ingresado una autonomía de " + autonomyKm + " kilómetros.");
+                updateRoute(); // Llamada a la función para actualizar la ruta después de que se haya ingresado la autonomía
+            }
+        }
+
+        window.onload = askAutonomy;
+
+        data.data.forEach(station => {
+            var greenIcon = L.icon({
+                iconUrl: 'file:///C:/Users/Nacho/Downloads/electric-station-fuel-svgrepo-com.svg',
+                iconSize: [38, 95],
+                popupAnchor: [0, -15]
+            });
+
+            var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+            markerCluster.addLayer(marker);
+        });
+
+        map.addLayer(markerCluster);
+
+        var plan = new L.Routing.Plan([], {
+            geocoder: L.Control.Geocoder.nominatim(),
+            routeWhileDragging: true
+        });
+
+        var routingControl = L.Routing.control({
+            routeWhileDragging: true,
+            plan: plan
+        }).addTo(map);
+
+        function clearMarkersAndRoute() {
+            map.eachLayer(function (layer) {
+        // Verifica si la capa es un marcador y no pertenece a un cluster de estaciones de carga
+                if (layer instanceof L.Marker && !layer.__parent) {
+                    map.removeLayer(layer);
+                }
+        });
+
+    routingControl.setWaypoints([]);
+}
+
+
+
+        function removeStops() {
+            routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
+        }
+
+        document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
+        document.getElementById('removeStopsButton').addEventListener('click', removeStops);
+        document.getElementById('changeAutonomyButton').addEventListener('click', askAutonomy);
+
+        function createButton(label, container) {
+            var btn = L.DomUtil.create('button', '', container);
+            btn.setAttribute('type', 'button');
+            btn.innerHTML = label;
+            return btn;
+        }
+
+        routingControl.on('waypointschanged', function(e) {
+            // Puedes manejar el evento de cambio de puntos de ruta aquí si es necesario
+        });
+
+        routingControl.on('routesfound', function(e) {
+    // Remover las marcas existentes antes de agregar las nuevas
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
+
+            var route = e.routes[0].coordinates;
+            var autonomyLeft = autonomyKm;
+            for (var i = 0; i < route.length - 1; i++) {
+                var distance = route[i].distanceTo(route[i + 1]);
+                autonomyLeft -= distance / 1000;
+                if (autonomyLeft <= 20) {
+                    var distanceFromStart = 0;
+                    while (distanceFromStart < autonomyKm * 1000) {
+                        var ratio = distanceFromStart / (autonomyKm * 1000);
+                        var xLat = route[i].lat + ratio * (route[i + 1].lat - route[i].lat);
+                        var xLng = route[i].lng + ratio * (route[i + 1].lng - route[i].lng);
+                        L.marker([xLat, xLng], { icon: L.divIcon({ className: 'x-marker', html: 'X' }) }).addTo(map);
+                        distanceFromStart += autonomyKm * 1000;
+                    }
+                    autonomyLeft += autonomyKm; // Incrementar autonomyLeft por autonomyKm
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
