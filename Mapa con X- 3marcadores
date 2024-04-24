@@ -142,8 +142,8 @@
                     "Latitude": 33.770508,
                     "Longitude": -118.265628
                 }
- ]
-        }
+            ]
+        };
 
         var autonomyKm = 200; // Valor inicial de la autonomía del coche en kilómetros
 
@@ -160,7 +160,7 @@
 
         data.data.forEach(station => {
             var greenIcon = L.icon({
-                iconUrl: 'file:///C:/Users/Nacho/Downloads/electric-station-fuel-svgrepo-com.svg',
+                iconUrl: 'electric-station-fuel-svgrepo-com.svg',
                 iconSize: [38, 95],
                 popupAnchor: [0, -15]
             });
@@ -171,7 +171,21 @@
 
         map.addLayer(markerCluster);
 
-        var plan = new L.Routing.Plan([], {
+        var ReversablePlan = L.Routing.Plan.extend({
+            createGeocoders: function() {
+                var container = L.Routing.Plan.prototype.createGeocoders.call(this),
+                    reverseButton = createButton('↑↓', container);
+
+                L.DomEvent.on(reverseButton, 'click', function() {
+                    var waypoints = this.getWaypoints();
+                    this.setWaypoints(waypoints.reverse());
+                }, this);
+
+                return container;
+            }
+        });
+
+        var plan = new ReversablePlan([], {
             geocoder: L.Control.Geocoder.nominatim(),
             routeWhileDragging: true
         });
@@ -183,16 +197,12 @@
 
         function clearMarkersAndRoute() {
             map.eachLayer(function (layer) {
-        // Verifica si la capa es un marcador y no pertenece a un cluster de estaciones de carga
                 if (layer instanceof L.Marker && !layer.__parent) {
                     map.removeLayer(layer);
                 }
-        });
-
-    routingControl.setWaypoints([]);
-}
-
-
+            });
+            routingControl.setWaypoints([]);
+        }
 
         function removeStops() {
             routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
@@ -214,7 +224,7 @@
         });
 
         routingControl.on('routesfound', function(e) {
-    // Remover las marcas existentes antes de agregar las nuevas
+            // Remover las marcas existentes antes de agregar las nuevas
             map.eachLayer(function(layer) {
                 if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
                     map.removeLayer(layer);
