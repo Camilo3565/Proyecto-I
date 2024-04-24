@@ -31,17 +31,22 @@
             background-color: #0056b3;
         }
         #clearMarkersButton {
-            bottom: 70px;
+            bottom: 220px;
             left: 20px;
             margin-bottom: 10px;
         }
         #removeStopsButton {
-            bottom: 20px;
+            bottom: 160px;
             left: 20px;
             margin-bottom: 10px;
         }
         #changeAutonomyButton {
-            bottom: 120px;
+            bottom: 100px;
+            left: 20px;
+            margin-bottom: 10px;
+        }
+        #filterSelect {
+            bottom: 40px;
             left: 20px;
             margin-bottom: 10px;
         }
@@ -53,6 +58,11 @@
 </head>
 <body>
     <div id="map"></div>
+    <select id="filterSelect" class="control-button">
+        <option value="all">All Chargers</option>
+        <option value="public">Public Chargers</option>
+        <option value="private">Private Chargers</option>
+    </select>
     <button id="clearMarkersButton" class="control-button">Clear Markers</button>
     <button id="removeStopsButton" class="control-button">Remove Stops</button>
     <button id="changeAutonomyButton" class="control-button">Change Autonomy</button>
@@ -100,48 +110,6 @@
                     "Latitude": 34.040539,
                     "Longitude": -118.271387
                 },
-                {
-                    "Fuel Type Code": "ELEC",
-                    "Station Name": "LADWP - John Ferraro Building",
-                    "Street Address": "111 N Hope St",
-                    "City": "Los Angeles",
-                    "State": "CA",
-                    "Country": "US",
-                    "Groups With Access Code": "Private",
-                    "EV Level1 EVSE Num": "null",
-                    "EV Level2 EVSE Num": 338.0,
-                    "EV DC Fast Count": 12.0,
-                    "Latitude": 34.059133,
-                    "Longitude": -118.248589
-                },
-                {
-                    "Fuel Type Code": "ELEC",
-                    "Station Name": "LADWP - Haynes Power Plant",
-                    "Street Address": "6801 E 2nd St",
-                    "City": "Long Beach",
-                    "State": "CA",
-                    "Country": "US",
-                    "Groups With Access Code": "Private",
-                    "EV Level1 EVSE Num": "null",
-                    "EV Level2 EVSE Num": 19.0,
-                    "EV DC Fast Count": 1.0,
-                    "Latitude": 33.759802,
-                    "Longitude": -118.096665
-                },
-                {
-                    "Fuel Type Code": "ELEC",
-                    "Station Name": "LADWP - Harbor Generating Station",
-                    "Street Address": "161 N Island Ave",
-                    "City": "Wilmington",
-                    "State": "CA",
-                    "Country": "US",
-                    "Groups With Access Code": "Private",
-                    "EV Level1 EVSE Num": "null",
-                    "EV Level2 EVSE Num": 10.0,
-                    "EV DC Fast Count": "null",
-                    "Latitude": 33.770508,
-                    "Longitude": -118.265628
-                }
             ]
         };
 
@@ -208,9 +176,32 @@
             routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
         }
 
+        function filterMarkersByType(type) {
+            markerCluster.clearLayers();
+            data.data.forEach(station => {
+            if (type === 'all' || station['Groups With Access Code'].toLowerCase() === type) {
+                var greenIcon = L.icon({
+                    iconUrl: 'electric-station-fuel-svgrepo-com.svg',
+                    iconSize: [38, 95],
+                    popupAnchor: [0, -15]
+                });
+
+                var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+                markerCluster.addLayer(marker);
+                }
+            });
+        }
+
+
+
+
         document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
         document.getElementById('removeStopsButton').addEventListener('click', removeStops);
         document.getElementById('changeAutonomyButton').addEventListener('click', askAutonomy);
+        document.getElementById('filterSelect').addEventListener('change', function() {
+            var selectedType = this.value;
+            filterMarkersByType(selectedType);
+        });
 
         function createButton(label, container) {
             var btn = L.DomUtil.create('button', '', container);
@@ -253,3 +244,5 @@
     </script>
 </body>
 </html>
+
+
