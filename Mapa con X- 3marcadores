@@ -31,22 +31,27 @@
             background-color: #0056b3;
         }
         #clearMarkersButton {
-            bottom: 220px;
+            bottom: 260px;
             left: 20px;
             margin-bottom: 10px;
         }
         #removeStopsButton {
-            bottom: 160px;
+            bottom: 200px;
             left: 20px;
             margin-bottom: 10px;
         }
         #changeAutonomyButton {
-            bottom: 100px;
+            bottom: 140px;
             left: 20px;
             margin-bottom: 10px;
         }
         #filterSelect {
-            bottom: 40px;
+            bottom: 80px;
+            left: 20px;
+            margin-bottom: 10px;
+        }
+        #filterSelect2 {
+            bottom: 20px;
             left: 20px;
             margin-bottom: 10px;
         }
@@ -62,6 +67,12 @@
         <option value="all">All Chargers</option>
         <option value="public">Public Chargers</option>
         <option value="private">Private Chargers</option>
+    </select>
+    <select id="filterSelect2" class="control-button">
+        <option value="all">All Charger Types</option>
+        <option value="level1">EV Level 1</option>
+        <option value="level2">EV Level 2</option>
+        <option value="dc">EV DC Fast</option>
     </select>
     <button id="clearMarkersButton" class="control-button">Clear Markers</button>
     <button id="removeStopsButton" class="control-button">Remove Stops</button>
@@ -179,21 +190,50 @@
         function filterMarkersByType(type) {
             markerCluster.clearLayers();
             data.data.forEach(station => {
-            if (type === 'all' || station['Groups With Access Code'].toLowerCase() === type) {
-                var greenIcon = L.icon({
-                    iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-                    iconSize: [38, 95],
-                    popupAnchor: [0, -15]
-                });
+                if (type === 'all' || station['Groups With Access Code'].toLowerCase() === type) {
+                    var greenIcon = L.icon({
+                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
+                        iconSize: [38, 95],
+                        popupAnchor: [0, -15]
+                    });
 
-                var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
-                markerCluster.addLayer(marker);
+                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+                    markerCluster.addLayer(marker);
                 }
             });
         }
 
+        function filterMarkersByAccessCode(accessCode) {
+            markerCluster.clearLayers();
+            data.data.forEach(station => {
+                if (accessCode === 'all' || station['EV Level1 EVSE Num'] === 'null' || station['EV Level2 EVSE Num'] === 'null' || station['EV DC Fast Count'] === 'null') {
+                    var greenIcon = L.icon({
+                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
+                        iconSize: [38, 95],
+                        popupAnchor: [0, -15]
+                    });
 
+                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+                    markerCluster.addLayer(marker);
+                }
+            });
+        }
 
+        function filterMarkersByChargerType(chargerType) {
+            markerCluster.clearLayers();
+            data.data.forEach(station => {
+                if (chargerType === 'all' || (station['EV Level1 EVSE Num'] !== 'null' && chargerType === 'level1') || (station['EV Level2 EVSE Num'] !== 'null' && chargerType === 'level2') || (station['EV DC Fast Count'] !== 'null' && chargerType === 'dc')) {
+                    var greenIcon = L.icon({
+                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
+                        iconSize: [38, 95],
+                        popupAnchor: [0, -15]
+                    });
+
+                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+                    markerCluster.addLayer(marker);
+                }
+            });
+        }
 
         document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
         document.getElementById('removeStopsButton').addEventListener('click', removeStops);
@@ -201,6 +241,11 @@
         document.getElementById('filterSelect').addEventListener('change', function() {
             var selectedType = this.value;
             filterMarkersByType(selectedType);
+        });
+
+        document.getElementById('filterSelect2').addEventListener('change', function() {
+            var selectedChargerType = this.value;
+            filterMarkersByChargerType(selectedChargerType);
         });
 
         function createButton(label, container) {
@@ -244,5 +289,3 @@
     </script>
 </body>
 </html>
-
-
