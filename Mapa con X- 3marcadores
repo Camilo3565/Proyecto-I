@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
-    <title>Leaflet Routing Machine Example</title>
+    <title>Mapa para coches eléctricos</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css" />
@@ -19,7 +19,7 @@
         .control-button {
             position: absolute;
             z-index: 1000;
-            background-color: #007bff;
+            background-color: #00b318;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -28,127 +28,165 @@
             cursor: pointer;
         }
         .control-button:hover {
-            background-color: #0056b3;
+            background-color: #00b318;
         }
         #clearMarkersButton {
-            bottom: 260px;
+            bottom: 165px;
             left: 20px;
             margin-bottom: 10px;
         }
         #removeStopsButton {
-            bottom: 200px;
+            bottom: 110px;
             left: 20px;
             margin-bottom: 10px;
         }
         #changeAutonomyButton {
-            bottom: 140px;
+            bottom: 55px;
             left: 20px;
             margin-bottom: 10px;
+            
         }
         #filterSelect {
-            bottom: 80px;
+            bottom: 0px;
             left: 20px;
             margin-bottom: 10px;
         }
-        #filterSelect2 {
-            bottom: 20px;
+        #chargingTime {
+            display: none;
+            bottom: 10px;
             left: 20px;
             margin-bottom: 10px;
         }
-        .x-marker {
-            color: black;
-            font-size: 12px;
+        /* Cambio de color al pasar el ratón */
+        
+        #timeCounter {
+            bottom: 25px;
+            right: 20px;
+            background-color: #00b318;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #chargingInterval {
+            bottom: 70px;
+            right: 20px;
+            background-color: #00b318;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        /* Ajuste de la imagen de recargar ruta */
+        #reloadRouteContainer {
+            bottom: 550px;
+            left: 60px;
+            margin-bottom: 10px;
+        }
+        #reloadRouteButton img {
+            width: 20px;
+            height: 20px;
         }
     </style>
 </head>
 <body>
     <div id="map"></div>
+    <button id="clearMarkersButton" class="control-button">Eliminar Ruta</button>
+    <button id="removeStopsButton" class="control-button">Eliminar Paradas</button>
+    <button id="changeAutonomyButton" class="control-button">Cambiar Autonomía</button>
     <select id="filterSelect" class="control-button">
-        <option value="all">All Chargers</option>
-        <option value="public">Public Chargers</option>
-        <option value="private">Private Chargers</option>
-    </select>
-    <select id="filterSelect2" class="control-button">
-        <option value="all">All Charger Types</option>
+        <option value="all">Todos los cargadores</option>
         <option value="level1">EV Level 1</option>
         <option value="level2">EV Level 2</option>
         <option value="dc">EV DC Fast</option>
     </select>
-    <button id="clearMarkersButton" class="control-button">Clear Markers</button>
-    <button id="removeStopsButton" class="control-button">Remove Stops</button>
-    <button id="changeAutonomyButton" class="control-button">Change Autonomy</button>
+    <div id="chargingTime" class="control-button" style="visibility: hidden;">Tiempo de carga: 0h</div>
+    <div id="timeCounter" class="control-button">Tiempo acumulado: 0h</div>
+    <div id="chargingInterval" class="control-button">Intervalo de tiempo de carga</div>
+    <!-- Nuevo botón para recargar la ruta -->
+    <div id="reloadRouteContainer" class="control-button" style="background-color: white;">
+        <button id="reloadRouteButton" style="background-color: white; border: none;">
+            <img src="C:\Users\Nacho\OneDrive\Desktop\159657.png" alt="Recargar Ruta">
+        </button>
+    </div>
+
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
     <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <script>
-        var map = L.map('map').setView([39.8283, -98.5795], 4); // Establecemos la vista del mapa en el centro de Estados Unidos
+        var map = L.map('map').setView([37.0902, -95.7129], 4); // Establecemos la vista del mapa centrada en Estados Unidos
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map); // Añadimos la capa de teselas de OpenStreetMap al mapa
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+}).addTo(map); // Añadimos la capa de teselas de OpenStreetMap al mapa
 
-        var markerCluster = L.markerClusterGroup(); // Crear grupo de marcadores
+var markerCluster = L.markerClusterGroup(); // Crear grupo de marcadores
 
-        // Datos de ejemplo (reemplaza con tus datos reales)
-        var data = {
-            "data": [
-                {
-                    "Fuel Type Code": "ELEC",
-                    "Station Name": "LADWP - Truesdale Center",
-                    "Street Address": "11797 Truesdale St",
-                    "City": "Sun Valley",
-                    "State": "CA",
-                    "Country": "US",
-                    "Groups With Access Code": "Private",
-                    "EV Level1 EVSE Num": "null",
-                    "EV Level2 EVSE Num": 57.0,
-                    "EV DC Fast Count": 2.0,
-                    "Latitude": 34.2483191527193,
-                    "Longitude": -118.3879713743439
-                },
-                {
-                    "Fuel Type Code": "ELEC",
-                    "Station Name": "Los Angeles Convention Center",
-                    "Street Address": "1201 S Figueroa St",
-                    "City": "Los Angeles",
-                    "State": "CA",
-                    "Country": "US",
-                    "Groups With Access Code": "Public",
-                    "EV Level1 EVSE Num": "null",
-                    "EV Level2 EVSE Num": 7.0,
-                    "EV DC Fast Count": "null",
-                    "Latitude": 34.040539,
-                    "Longitude": -118.271387
-                },
-            ]
-        };
+// Datos de ejemplo (reemplaza con tus datos reales)
+var data = {
+    "data": [
+        {
+            "Fuel Type Code": "ELEC",
+            "Station Name": "LADWP - Truesdale Center",
+            "Street Address": "11797 Truesdale St",
+            "City": "Sun Valley",
+            "State": "CA",
+            "Country": "US",
+            "Groups With Access Code": "Private",
+            "EV Level1 EVSE Num": "null",
+            "EV Level2 EVSE Num": 57.0,
+            "EV DC Fast Count": 2.0,
+            "Latitude": 34.2483191527193,
+            "Longitude": -118.3879713743439
+        },
+        {
+            "Fuel Type Code": "ELEC",
+            "Station Name": "Los Angeles Convention Center",
+            "Street Address": "1201 S Figueroa St",
+            "City": "Los Angeles",
+            "State": "CA",
+            "Country": "US",
+            "Groups With Access Code": "Public",
+            "EV Level1 EVSE Num": "null",
+            "EV Level2 EVSE Num": 7.0,
+            "EV DC Fast Count": "null",
+            "Latitude": 34.040539,
+            "Longitude": -118.271387
+        }
+    ]
+};
 
         var autonomyKm = 200; // Valor inicial de la autonomía del coche en kilómetros
+        var accumulatedTime = 0; // Variable para almacenar el tiempo acumulado
+        var fastChargingTime = 0; // Tiempo acumulado para cargadores rápidos
+        var level1ChargingTime = 0; // Tiempo acumulado para cargadores de nivel 1
+
+        // Preguntar al usuario por la autonomía al cargar la página
+        window.onload = function() {
+            filterMarkersByChargerType('all'); // Mostrar todos los cargadores al cargar la página
+            askAutonomy();
+        };
 
         function askAutonomy() {
             var autonomy = prompt("Por favor, ingrese la autonomía del coche en kilómetros:");
             if (autonomy !== null) {
                 autonomyKm = parseFloat(autonomy);
                 alert("Has ingresado una autonomía de " + autonomyKm + " kilómetros.");
-                updateRoute(); // Llamada a la función para actualizar la ruta después de que se haya ingresado la autonomía
+                // Avisar al usuario si el filtro está en "default"
+                var selectedChargerType = document.getElementById('filterSelect').value;
+                if (selectedChargerType === 'all') {
+                    alert('El filtro de cargadores está en "Todos los cargadores". Por favor, revíselo y seleccione un tipo para obtener una estimación precisa del tiempo de carga.');
+                }
             }
         }
 
-        window.onload = askAutonomy;
-
-        data.data.forEach(station => {
-            var greenIcon = L.icon({
-                iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-                iconSize: [38, 95],
-                popupAnchor: [0, -15]
-            });
-
-            var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
-            markerCluster.addLayer(marker);
-        });
-
-        map.addLayer(markerCluster);
+        function createButton(label, container) {
+            var btn = L.DomUtil.create('button', '', container);
+            btn.setAttribute('type', 'button');
+            btn.innerHTML = label;
+            return btn;
+        }
 
         var ReversablePlan = L.Routing.Plan.extend({
             createGeocoders: function() {
@@ -172,7 +210,7 @@
         var routingControl = L.Routing.control({
             routeWhileDragging: true,
             plan: plan
-        }).addTo(map);
+        });
 
         function clearMarkersAndRoute() {
             map.eachLayer(function (layer) {
@@ -181,85 +219,50 @@
                 }
             });
             routingControl.setWaypoints([]);
+            document.getElementById('chargingTime').style.display = 'none'; // Ocultar el tiempo de carga cuando se borran las rutas
+            accumulatedTime = 0; // Reiniciar el tiempo acumulado
+            document.getElementById('timeCounter').innerText = 'Tiempo acumulado: 0h'; // Actualizar el contador de tiempo acumulado
+            fastChargingTime = 0; // Reiniciar el tiempo de carga para cargadores rápidos
+            level1ChargingTime = 0; // Reiniciar el tiempo de carga para cargadores de nivel 1
+            document.getElementById('chargingInterval').innerText = 'Intervalo de tiempo de carga'; // Restablecer el texto del intervalo de tiempo de carga
         }
 
         function removeStops() {
             routingControl.getPlan().setWaypoints([routingControl.getWaypoints()[0], routingControl.getWaypoints().pop()]);
         }
 
-        function filterMarkersByType(type) {
-            markerCluster.clearLayers();
-            data.data.forEach(station => {
-                if (type === 'all' || station['Groups With Access Code'].toLowerCase() === type) {
-                    var greenIcon = L.icon({
-                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-                        iconSize: [38, 95],
-                        popupAnchor: [0, -15]
-                    });
-
-                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
-                    markerCluster.addLayer(marker);
-                }
-            });
-        }
-
-        function filterMarkersByAccessCode(accessCode) {
-            markerCluster.clearLayers();
-            data.data.forEach(station => {
-                if (accessCode === 'all' || station['EV Level1 EVSE Num'] === 'null' || station['EV Level2 EVSE Num'] === 'null' || station['EV DC Fast Count'] === 'null') {
-                    var greenIcon = L.icon({
-                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-                        iconSize: [38, 95],
-                        popupAnchor: [0, -15]
-                    });
-
-                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
-                    markerCluster.addLayer(marker);
-                }
-            });
-        }
-
         function filterMarkersByChargerType(chargerType) {
             markerCluster.clearLayers();
             data.data.forEach(station => {
+                var iconUrl = 'https://upload.wikimedia.org/wikipedia/commons/5/5d/Electric_station_fuel_svgrepo_com.svg';
+                var iconSize = [38, 95];
+                var popupContent = station['Station Name'];
+                
                 if (chargerType === 'all' || (station['EV Level1 EVSE Num'] !== 'null' && chargerType === 'level1') || (station['EV Level2 EVSE Num'] !== 'null' && chargerType === 'level2') || (station['EV DC Fast Count'] !== 'null' && chargerType === 'dc')) {
                     var greenIcon = L.icon({
-                        iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-                        iconSize: [38, 95],
+                        iconUrl: iconUrl,
+                        iconSize: iconSize,
                         popupAnchor: [0, -15]
                     });
 
-                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(station['Station Name']);
+                    var marker = L.marker([station.Latitude, station.Longitude], { icon: greenIcon }).bindPopup(popupContent);
                     markerCluster.addLayer(marker);
                 }
             });
+            map.addLayer(markerCluster); // Añadir el grupo de clúster al mapa
         }
 
         document.getElementById('clearMarkersButton').addEventListener('click', clearMarkersAndRoute);
         document.getElementById('removeStopsButton').addEventListener('click', removeStops);
         document.getElementById('changeAutonomyButton').addEventListener('click', askAutonomy);
         document.getElementById('filterSelect').addEventListener('change', function() {
-            var selectedType = this.value;
-            filterMarkersByType(selectedType);
-        });
-
-        document.getElementById('filterSelect2').addEventListener('change', function() {
             var selectedChargerType = this.value;
             filterMarkersByChargerType(selectedChargerType);
         });
 
-        function createButton(label, container) {
-            var btn = L.DomUtil.create('button', '', container);
-            btn.setAttribute('type', 'button');
-            btn.innerHTML = label;
-            return btn;
-        }
+        routingControl.on('routesfound', function(e){
+            accumulatedTime = 0; // Reiniciar el tiempo acumulado cada vez que se establece una nueva ruta
 
-        routingControl.on('waypointschanged', function(e) {
-            // Puedes manejar el evento de cambio de puntos de ruta aquí si es necesario
-        });
-
-        routingControl.on('routesfound', function(e) {
             // Remover las marcas existentes antes de agregar las nuevas
             map.eachLayer(function(layer) {
                 if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
@@ -269,10 +272,15 @@
 
             var route = e.routes[0].coordinates;
             var autonomyLeft = autonomyKm;
+
+            // Verificar si el filtro está en "default" (todos los tipos de cargadores)
+            var selectedChargerType = document.getElementById('filterSelect').value;
+            var filterDefault = selectedChargerType === 'all';
+
             for (var i = 0; i < route.length - 1; i++) {
                 var distance = route[i].distanceTo(route[i + 1]);
                 autonomyLeft -= distance / 1000;
-                if (autonomyLeft <= 20) {
+                if (!filterDefault && autonomyLeft <= 20) {
                     var distanceFromStart = 0;
                     while (distanceFromStart < autonomyKm * 1000) {
                         var ratio = distanceFromStart / (autonomyKm * 1000);
@@ -282,12 +290,55 @@
                         distanceFromStart += autonomyKm * 1000;
                     }
                     autonomyLeft += autonomyKm; // Incrementar autonomyLeft por autonomyKm
+                    
+                    // Ajustar el tiempo acumulado según el tipo de cargador seleccionado
+                    switch(selectedChargerType) {
+                        case 'level1':
+                            accumulatedTime += 8; // Aumentar el tiempo acumulado por 8 horas
+                            level1ChargingTime = accumulatedTime; // Guardar tiempo acumulado para cargadores de nivel 1
+                            break;
+                        case 'level2':
+                            accumulatedTime += 4; // Aumentar el tiempo acumulado por 4 horas
+                            break;
+                        case 'dc':
+                            accumulatedTime += 0.5; // Aumentar el tiempo acumulado por 0.5 horas
+                            fastChargingTime = accumulatedTime; // Guardar tiempo acumulado para cargadores rápidos
+                            break;
+                        default:
+                            // Si no se selecciona ningún tipo de cargador, mostrar un mensaje
+                            alert('Seleccione un tipo de cargador para poder calcular el tiempo de carga');
+                            return 'X';
+                    }
+                    document.getElementById('timeCounter').innerText = 'Tiempo acumulado: ' + accumulatedTime + 'h'; // Actualizar el contador de tiempo acumulado
                 }
+            }
+
+            // Calcular el tiempo de carga solo si no estamos en el modo "default"
+            if (!filterDefault) {
+                var totalDistance = 0;
+                for (var j = 0; j < route.length - 1; j++) {
+                    totalDistance += route[j].distanceTo(route[j + 1]);
+                }
+                var chargingTime = Math.floor(totalDistance / autonomyKm) * 0.5; // 30 minutos por 100 km (0.5h)
+
+                // Mostrar el tiempo de carga en el elemento de HTML
+                document.getElementById('chargingTime').innerText = 'Tiempo de carga: ' + chargingTime + 'h';
+                document.getElementById('chargingTime').style.display = 'block'; // Mostrar el tiempo de carga
+
+                // Mostrar el intervalo de tiempo de carga
+                document.getElementById('chargingInterval').innerText = 'Intervalo de carga: ' + fastChargingTime + 'h - ' + level1ChargingTime + 'h';
             }
         });
 
+        routingControl.addTo(map); // Agregar control de enrutamiento al mapa
+
+        function reloadRoute() {
+            routingControl.route(); // Recargar la ruta
+        }
+
+        // Asociar la función al botón de recargar ruta
+        document.getElementById('reloadRouteButton').addEventListener('click', reloadRoute);
     </script>
 </body>
 </html>
-
 
