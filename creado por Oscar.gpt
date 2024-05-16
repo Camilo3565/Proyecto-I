@@ -18,101 +18,74 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
     <style>
-        #map {
-            position: absolute;
-            top: 0;
-            left: 0;
+        body, html {
             height: 100%;
-            width: 100%;
+            margin: 0;
+            display: flex;
         }
-        .control-button {
-            position: absolute;
-            z-index: 1000;
+
+        #sidebar {
+            width: 300px;
+            background: #333;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        #map {
+            flex-grow: 1;
+        }
+
+        .sidebar-button, #filterSelect, #chargingTime, #timeCounter, #chargingInterval, #reloadRouteContainer {
+            width: 100%;
+            margin-bottom: 10px;
+            padding: 10px;
+            font-size: 16px;
             background-color: #00b318;
             color: white;
             border: none;
-            padding: 10px 20px;
-            font-size: 16px;
             border-radius: 5px;
             cursor: pointer;
+            text-align: center;
         }
-        .control-button:hover {
+
+        .sidebar-button:hover, #filterSelect:hover, #chargingTime:hover, #timeCounter:hover, #chargingInterval:hover, #reloadRouteContainer:hover {
             background-color: #008f14;
         }
-        #clearMarkersButton {
-            bottom: 165px;
-            left: 20px;
-            margin-bottom: 10px;
-        }
-        #removeStopsButton {
-            bottom: 110px;
-            left: 20px;
-            margin-bottom: 10px;
-        }
-        #changeAutonomyButton {
-            bottom: 55px;
-            left: 20px;
-            margin-bottom: 10px;
-        }
-        #filterSelect {
-            bottom: 0px;
-            left: 20px;
-            margin-bottom: 10px;
-        }
-        #chargingTime {
-            bottom: 10px;
-            left: 20px;
-            visibility: hidden;
-        }
-        #timeCounter {
-            bottom: 25px;
-            right: 20px;
-            background-color: #00b318;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        #chargingInterval {
-            bottom: 70px;
-            right: 20px;
-            background-color: #00b318;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        #reloadRouteContainer {
-            bottom: 550px;
-            left: 60px;
-            background-color: white;
-            margin-bottom: 10px;
-        }
+
         #reloadRouteButton img {
             width: 20px;
             height: 20px;
         }
+
+        #chargingTime, #timeCounter, #chargingInterval {
+            display: none; /* Ocultos por defecto */
+        }
     </style>
 </head>
 <body>
-    <div id="map"></div>
-    <button id="clearMarkersButton" class="control-button">Eliminar Ruta</button>
-    <button id="removeStopsButton" class="control-button">Eliminar Paradas</button>
-    <button id="changeAutonomyButton" class="control-button">Cambiar Autonomía</button>
-    <select id="filterSelect" class="control-button">
-        <option value="all">Todos los cargadores</option>
-        <option value="level1">EV Level 1</option>
-        <option value="level2">EV Level 2</option>
-        <option value="dc">EV DC Fast</option>
-    </select>
-    <div id="chargingTime" class="control-button">Tiempo de carga: 0h</div>
-    <div id="timeCounter" class="control-button">Tiempo acumulado: 0h</div>
-    <div id="chargingInterval" class="control-button">Intervalo de tiempo de carga</div>
-    <div id="reloadRouteContainer" class="control-button">
-        <button id="reloadRouteButton">
-            <img src="C:\Users\Nacho\OneDrive\Desktop\159657.png" alt="Recargar Ruta">
-        </button>
+    <div id="sidebar">
+        <button id="clearMarkersButton" class="sidebar-button">Eliminar Ruta</button>
+        <button id="removeStopsButton" class="sidebar-button">Eliminar Paradas</button>
+        <button id="changeAutonomyButton" class="sidebar-button">Cambiar Autonomía</button>
+        <select id="filterSelect" class="sidebar-button">
+            <option value="all">Todos los cargadores</option>
+            <option value="level1">EV Level 1</option>
+            <option value="level2">EV Level 2</option>
+            <option value="dc">EV DC Fast</option>
+        </select>
+        <div id="chargingTime" class="sidebar-button">Tiempo de carga: 0h</div>
+        <div id="timeCounter" class="sidebar-button">Tiempo acumulado: 0h</div>
+        <div id="chargingInterval" class="sidebar-button">Intervalo de tiempo de carga</div>
+        <div id="reloadRouteContainer" class="sidebar-button">
+            <button id="reloadRouteButton">
+                <img src="C:\Users\Nacho\OneDrive\Desktop\159657.png" alt="Recargar Ruta">
+            </button>
+        </div>
     </div>
+    <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
