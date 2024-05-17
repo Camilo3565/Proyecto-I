@@ -84,6 +84,7 @@
 
         var markerCluster = L.markerClusterGroup();
         var routingControl = null;
+        var geocoder = L.Control.Geocoder.nominatim(); // Crear instancia de geocodificador
 
         var originalData = [
             {
@@ -118,7 +119,7 @@
 
         var data = originalData.slice(); // Hacer una copia de los datos originales
         var customIcon = L.icon({
-            iconUrl: 'file:///C:/Users/Nacho/Downloads/electric-station-fuel-svgrepo-com.svg',
+            iconUrl: 'electric-station-fuel-svgrepo-com.svg',
             iconSize: [32, 32], // Tamaño del ícono
             iconAnchor: [16, 32] // Punto de anclaje del ícono
         });
@@ -180,6 +181,9 @@
             if (checkbox.checked) {
                 // Cambiar a la vista de ruta
                 resetFilters(); // Restablecer los filtros cuando se cambia al módulo de ruta
+                if (routingControl) {
+                    routingControl.setWaypoints([]); // Limpiar waypoints existentes
+                }
             } else {
                 // Cambiar a la vista de búsqueda
             }
@@ -202,14 +206,14 @@
             if (routingControl) {
                 map.removeControl(routingControl);
             }
-            // Aquí puedes agregar la lógica para configurar la nueva ruta
-            // Ejemplo: configuración básica de una ruta
+            // Configurar la nueva ruta con geocodificador
             routingControl = L.Routing.control({
                 waypoints: [
                     L.latLng(34.0522, -118.2437), // Los Ángeles
                     L.latLng(36.1699, -115.1398)  // Las Vegas
                 ],
-                routeWhileDragging: true
+                routeWhileDragging: true,
+                geocoder: geocoder // Especificar el geocodificador a utilizar
             }).addTo(map);
         });
 
@@ -225,7 +229,7 @@
         // Event listener para el botón de eliminar paradas
         document.getElementById('removeStopsButton').addEventListener('click', function () {
             if (routingControl) {
-                routingControl.setWaypoints([]);
+                routingControl.setWaypoints([]); // Eliminar paradas en la ruta
             }
         });
     </script>
