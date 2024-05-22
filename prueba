@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página definitiva</title>
     <link rel="stylesheet" href="styles2.css">
-
     <!-- Leaflet CSS y JavaScript -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"/>
     <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
@@ -17,6 +16,28 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    <!-- Agrega aquí el CSS personalizado -->
+    <style>
+        /* Agrandar los cuadros de entrada de 'Start' y 'End' */
+        .leaflet-routing-container .leaflet-routing-geocoder {
+            font-size: 16px;
+        }
+
+        .leaflet-routing-container .leaflet-routing-geocoder input {
+            height: 40px;
+            width: 300px; /* Ajusta según el tamaño deseado */
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .leaflet-routing-container .leaflet-routing-geocoder .leaflet-routing-remove-waypoint {
+            font-size: 16px;
+        }
+
+        .leaflet-routing-container .leaflet-routing-geocoders {
+            margin-bottom: 20px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -141,24 +162,27 @@
             var powerFilter = document.getElementById('search-power-filter').value;
             var stateFilter = document.getElementById('search-state-filter').value;
             var chargerFilter = document.getElementById('search-charger-filter').value;
+
             data = originalData.filter(function (station) {
                 var passPowerFilter = (powerFilter === 'all') || (station['Groups With Access Code'] === powerFilter);
-                var passStateFilter = (stateFilter === 'all') || (station['State'] === stateFilter);
-                var passChargerFilter = (chargerFilter === 'all') || 
-                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') || 
-                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') || 
+                var passStateFilter = (stateFilter === 'all') || (station.State === stateFilter);
+                var passChargerFilter = (chargerFilter === 'all') ||
+                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') ||
+                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') ||
                     (chargerFilter === 'DC Fast' && station['EV DC Fast Count'] !== 'null');
+
                 return passPowerFilter && passStateFilter && passChargerFilter;
             });
+
             addMarkers();
         }
 
         function applyRouteFilters() {
             var chargerFilter = document.getElementById('route-charger-filter').value;
             data = originalData.filter(function (station) {
-                var passChargerFilter = (chargerFilter === 'all') || 
-                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') || 
-                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') || 
+                var passChargerFilter = (chargerFilter === 'all') ||
+                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') ||
+                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') ||
                     (chargerFilter === 'DC Fast' && station['EV DC Fast Count'] !== 'null');
                 return passChargerFilter;
             });
