@@ -23,28 +23,28 @@
         <div class="wrapper">
             <div class="card-switch">
                 <label class="switch">
-                   <input type="checkbox" class="toggle">
+                   <input type="checkbox" class="toggle" id="routeToggle" onchange="resetFilters()">
                    <span class="slider"></span>
                    <span class="card-side"></span>
                    <div class="flip-card__inner">
                       <div class="flip-card__front">
                          <div class="title">Búsqueda</div>
                          <form class="flip-card__form" action="">
-                            <label for="charger-filter">Tipo de Cargador:</label>
-                            <select id="charger-filter" class="flip-card__input">
+                            <label for="search-charger-filter">Tipo de Cargador:</label>
+                            <select id="search-charger-filter" class="flip-card__input">
                                 <option value="all">Todos</option>
                                 <option value="Level 1">Tipo 1</option>
                                 <option value="Level 2">Tipo 2</option>
                                 <option value="DC Fast">Tipo Fast</option>
                             </select>
-                            <label for="power-filter">Acceso:</label>
-                            <select id="power-filter" class="flip-card__input">
+                            <label for="search-power-filter">Acceso:</label>
+                            <select id="search-power-filter" class="flip-card__input">
                               <option value="all">Todos</option>
                               <option value="Public">Público</option>
                               <option value="Private">Privado</option>
                             </select>
-                            <label for="state-filter">Estado:</label>
-                            <select id="state-filter" class="flip-card__input">
+                            <label for="search-state-filter">Estado:</label>
+                            <select id="search-state-filter" class="flip-card__input">
                                 <option value="all">Todos</option>
                                 <option value="AB">Alberta</option>
                                 <option value="AK">Alaska</option>
@@ -54,18 +54,23 @@
                          </form>
                       </div>
                       <div class="flip-card__back">
-                         <div class="title">Ruta </div>
+                         <div class="title">Ruta</div>
                          <form class="flip-card__form" action="">
-                            <label for="charger-filter-route">Tipo de Cargador:</label>
-                            <select id="charger-filter-route" class="flip-card__input">
+                            <label for="route-charger-filter">Tipo de Cargador:</label>
+                            <select id="route-charger-filter" class="flip-card__input">
                                 <option value="all">Todos</option>
                                 <option value="Level 1">Tipo 1</option>
                                 <option value="Level 2">Tipo 2</option>
                                 <option value="DC Fast">Tipo Fast</option>
                             </select>
-                            <button type="button" class="flip-card__btn" id="changeRouteButton">Cambiar Ruta</button>
-                            <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar Autonomía</button>
-                            <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
+                            <button type="button" id="clearMarkersButton" class="flip-card__btn">Eliminar ruta</button>
+                            <button type="button" id="removeStopsButton" class="flip-card__btn">Eliminar paradas</button>
+                            <button type="button" id="changeAutonomyButton" class="flip-card__btn">Cambiar autonomía</button>
+                            <div id="reloadRouteContainer" class="control-button">
+                                <button type="button" id="reloadRouteButton" style="background-color: white; border: none;">
+                                    <img src="C:\Users\Nacho\OneDrive\Desktop\159657.png" alt="Recargar Ruta">
+                                </button>
+                            </div>
                          </form>
                       </div>
                    </div>
@@ -73,6 +78,7 @@
             </div>   
         </div>
     </div>
+    
 
     <div id="map" style="position: absolute; top: 10px; right: 10px; height: calc(100vh - 20px); width: calc(100vw - 510px);"></div>
 
@@ -83,8 +89,6 @@
         }).addTo(map);
 
         var markerCluster = L.markerClusterGroup();
-        var routingControl = null;
-        var geocoder = L.Control.Geocoder.nominatim(); // Crear instancia de geocodificador
 
         var originalData = [
             {
@@ -119,117 +123,193 @@
 
         var data = originalData.slice(); // Hacer una copia de los datos originales
         var customIcon = L.icon({
-            iconUrl: 'electric-station-fuel-svgrepo-com.svg',
-            iconSize: [32, 32], // Tamaño del ícono
-            iconAnchor: [16, 32] // Punto de anclaje del ícono
+            iconUrl: 'file:///C:/Users/Nacho/Downloads/electric-station-fuel-svgrepo-com.svg',
+            iconSize: [32, 32],
+            iconAnchor: [16, 32] // Punto de anclaje
         });
-
+        
         // Función para agregar marcadores al mapa
         function addMarkers() {
-            markerCluster.clearLayers(); // Limpiar marcadores existentes
+            markerCluster.clearLayers(); // Limpiar marcadores anteriores
             data.forEach(function (station) {
                 var marker = L.marker([station.Latitude, station.Longitude], { icon: customIcon });
-                marker.bindPopup(`<b>${station['Station Name']}</b><br>${station['Street Address']}, ${station.City}, ${station.State}`);
-                markerCluster.addLayer(marker);
+                marker.bindPopup(station['Station Name']);
+                markerCluster.addLayer
+                (marker);
             });
-            map.addLayer(markerCluster); // Agregar grupo de marcadores al mapa
+            map.addLayer(markerCluster);
         }
 
-        // Función para filtrar los marcadores según los criterios seleccionados
-        function applyFilters() {
-            var accessFilter = document.getElementById('power-filter').value;
-            var stateFilter = document.getElementById('state-filter').value;
-            var chargerFilter = document.getElementById('charger-filter').value;
-
+        // Función para aplicar filtros en la opción de búsqueda
+        function applySearchFilters() {
+            var powerFilter = document.getElementById('search-power-filter').value;
+            var stateFilter = document.getElementById('search-state-filter').value;
+            var chargerFilter = document.getElementById('search-charger-filter').value;
             data = originalData.filter(function (station) {
-                var passAccessFilter = accessFilter === 'all' || station['Groups With Access Code'].toLowerCase() === accessFilter.toLowerCase();
-                var passStateFilter = stateFilter === 'all' || station['State'] === stateFilter;
-                var passChargerFilter = chargerFilter === 'all' ||
-                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') ||
-                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') ||
+                var passPowerFilter = (powerFilter === 'all') || (station['Groups With Access Code'] === powerFilter);
+                var passStateFilter = (stateFilter === 'all') || (station['State'] === stateFilter);
+                var passChargerFilter = (chargerFilter === 'all') || 
+                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') || 
+                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') || 
                     (chargerFilter === 'DC Fast' && station['EV DC Fast Count'] !== 'null');
-                return passAccessFilter && passStateFilter && passChargerFilter;
+                return passPowerFilter && passStateFilter && passChargerFilter;
             });
-            addMarkers(); // Agregar marcadores después de aplicar los filtros
+            addMarkers();
         }
 
-        // Función para aplicar los filtros en el módulo de ruta
+        // Función para aplicar filtros en la opción de ruta
         function applyRouteFilters() {
-            var chargerFilterRoute = document.getElementById('charger-filter-route').value;
-
+            var chargerFilter = document.getElementById('route-charger-filter').value;
             data = originalData.filter(function (station) {
-                var passChargerFilter = chargerFilterRoute === 'all' ||
-                    (chargerFilterRoute === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') ||
-                    (chargerFilterRoute === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') ||
-                    (chargerFilterRoute === 'DC Fast' && station['EV DC Fast Count'] !== 'null');
+                var passChargerFilter = (chargerFilter === 'all') || 
+                    (chargerFilter === 'Level 1' && station['EV Level1 EVSE Num'] !== 'null') || 
+                    (chargerFilter === 'Level 2' && station['EV Level2 EVSE Num'] !== 'null') || 
+                    (chargerFilter === 'DC Fast' && station['EV DC Fast Count'] !== 'null');
                 return passChargerFilter;
             });
-            addMarkers(); // Agregar marcadores después de aplicar los filtros
+            addMarkers();
         }
 
-        // Función para restablecer los filtros a sus valores predeterminados
-        function resetFilters() {
-            document.getElementById('charger-filter').value = 'all';
-            document.getElementById('power-filter').value = 'all';
-            document.getElementById('state-filter').value = 'all';
-            applyFilters(); // Aplicar los filtros restablecidos
-        }
+        // Event listeners para aplicar los filtros al cambiar las selecciones
+        document.getElementById('search-power-filter').addEventListener('change', applySearchFilters);
+        document.getElementById('search-state-filter').addEventListener('change', applySearchFilters);
+        document.getElementById('search-charger-filter').addEventListener('change', applySearchFilters);
+        document.getElementById('route-charger-filter').addEventListener('change', applyRouteFilters);
 
-        // Función para cambiar entre los módulos (búsqueda y ruta)
-        function switchModule() {
-            var checkbox = document.querySelector('.toggle');
-            if (checkbox.checked) {
-                // Cambiar a la vista de ruta
-                resetFilters(); // Restablecer los filtros cuando se cambia al módulo de ruta
-                if (routingControl) {
-                    routingControl.setWaypoints([]); // Limpiar waypoints existentes
+        // Inicializar los marcadores en el mapa
+        addMarkers();
+
+        // Inicializar el control de ruta, inicialmente oculto
+        var routingControl = L.Routing.control({
+            waypoints: [],
+            routeWhileDragging: true,
+            geocoder: L.Control.Geocoder.nominatim(),
+            showAlternatives: true,
+            altLineOptions: {
+                styles: [
+                    { color: 'black', opacity: 0.15, weight: 9 },
+                    { color: 'blue', opacity: 0.15, weight: 6 },
+                    { color: 'blue', opacity: 0.5, weight: 2 }
+                ]
+            }
+        });
+
+        // Función para limpiar los marcadores de la ruta
+        function clearRouteMarkers() {
+            routingControl.setWaypoints([]); // Limpiar los puntos de la ruta
+            map.eachLayer(function (layer) {
+                if (layer.options && layer.options.icon && layer.options.icon.options && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
                 }
+            });
+        }
+
+        // Función para reiniciar los filtros cuando cambia el interruptor
+        // Función para reiniciar los filtros cuando cambia el interruptor
+        function resetFilters() {
+            var isRoute = document.getElementById('routeToggle').checked;
+            if (!isRoute) {
+                document.getElementById('search-power-filter').value = 'all';
+                document.getElementById('search-state-filter').value = 'all';
+                document.getElementById('search-charger-filter').value = 'all';
+                applySearchFilters();
+                
+                // Ocultar y remover el control de ruta
+                if (map.hasLayer(routingControl)) {
+                    map.removeControl(routingControl);
+                }
+
+                // Eliminar el geocoder de inicio y fin
+                var geocoderContainer = document.querySelector('.leaflet-routing-geocoders');
+                if (geocoderContainer) {
+                    geocoderContainer.remove();
+                }
+
+                // Ejecutar la misma lógica que el botón "Eliminar ruta"
+                clearRouteMarkers();
+                // Remover las marcas "X"
+                map.eachLayer(function (layer) {
+                    if (layer.options && layer.options.icon && layer.options.icon.options && layer.options.icon.options.className === 'x-marker') {
+                        map.removeLayer(layer);
+                    }
+                });
+                // Restablecer la vista del mapa
+                map.setView([37.0902, -95.7129], 4);
             } else {
-                // Cambiar a la vista de búsqueda
+                document.getElementById('route-charger-filter').value = 'all';
+                applyRouteFilters();
+                // Agregar control de ruta
+                if (!map.hasLayer(routingControl)) {
+                    routingControl.addTo(map);
+                }
             }
         }
 
-        // Llamar a la función switchModule al cambiar el interruptor
-        document.querySelector('.toggle').addEventListener('change', switchModule);
 
-        // Aplicar los filtros cuando la página se carga inicialmente
-        applyFilters();
+        // Botón para limpiar los marcadores de la ruta
+        document.getElementById('clearMarkersButton').addEventListener('click', clearRouteMarkers);
+            
 
-        // Event listeners para los selectores de filtro
-        document.getElementById('charger-filter').addEventListener('change', applyFilters);
-        document.getElementById('power-filter').addEventListener('change', applyFilters);
-        document.getElementById('state-filter').addEventListener('change', applyFilters);
-        document.getElementById('charger-filter-route').addEventListener('change', applyRouteFilters);
-
-        // Event listener para el botón de cambiar ruta
-        document.getElementById('changeRouteButton').addEventListener('click', function () {
-            if (routingControl) {
-                map.removeControl(routingControl);
-            }
-            // Configurar la nueva ruta con geocodificador
-            routingControl = L.Routing.control({
-                waypoints: [
-                    L.latLng(34.0522, -118.2437), // Los Ángeles
-                    L.latLng(36.1699, -115.1398)  // Las Vegas
-                ],
-                routeWhileDragging: true,
-                geocoder: geocoder // Especificar el geocodificador a utilizar
-            }).addTo(map);
-        });
-
-        // Event listener para el botón de cambiar autonomía
-        document.getElementById('changeAutonomyButton').addEventListener('click', function () {
-            var newAutonomy = prompt("Ingrese la nueva autonomía (en km):");
-            if (newAutonomy) {
-                alert("Autonomía cambiada a: " + newAutonomy + " km");
-                // Aquí puedes agregar la lógica para actualizar la autonomía en tu aplicación
-            }
-        });
-
-        // Event listener para el botón de eliminar paradas
+        // Botón para eliminar las paradas de la ruta
         document.getElementById('removeStopsButton').addEventListener('click', function () {
-            if (routingControl) {
-                routingControl.setWaypoints([]); // Eliminar paradas en la ruta
+            var waypoints = routingControl.getWaypoints();
+            if (waypoints.length > 2) {
+                routingControl.getPlan().setWaypoints([waypoints[0], waypoints[waypoints.length - 1]]);
+            }
+        });
+
+        // Botón para cambiar la autonomía del vehículo eléctrico
+        document.getElementById('changeAutonomyButton').addEventListener('click', function () {
+            var newAutonomy = prompt("Ingrese la nueva autonomía en km:");
+            if (newAutonomy) {
+                // Actualizar la autonomía del vehículo y recalcular la ruta
+                autonomyKm = parseFloat(newAutonomy);
+                var waypoints = routingControl.getWaypoints();
+                routingControl.setWaypoints([]);
+                routingControl.setWaypoints(waypoints);
+            }
+        });
+
+        // Botón para recargar la ruta
+        document.getElementById('reloadRouteButton').addEventListener('click', function () {
+            var waypoints = routingControl.getWaypoints();
+            routingControl.setWaypoints([]); // Limpiar los puntos de la ruta
+            routingControl.setWaypoints(waypoints); // Volver a establecer los puntos de la ruta
+        });
+
+        // Inicialmente ocultar el control de ruta
+        if (document.getElementById('routeToggle').checked) {
+            routingControl.addTo(map);
+        }
+
+        var autonomyKm = 200; // Valor inicial de la autonomía del coche en kilómetros
+
+        routingControl.on('routesfound', function (e) {
+            var route = e.routes[0].coordinates;
+            var autonomyLeft = autonomyKm; // Inicializar la autonomía restante
+
+            // Limpiar las marcas existentes
+            map.eachLayer(function (layer) {
+                if (layer.options && layer.options.icon && layer.options.icon.options && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
+
+            // Iterar sobre los puntos de la ruta para mostrar las marcas "X" cada 180 km
+            for (var i = 0; i < route.length - 1; i++) {
+                var distance = route[i].distanceTo(route[i + 1]);
+                autonomyLeft -= distance / 1000;
+                if (autonomyLeft <= 20) {
+                    var distanceFromStart = 0;
+                    while (distanceFromStart < autonomyKm * 1000) {
+                        var ratio = distanceFromStart / (autonomyKm * 1000);
+                        var xLat = route[i].lat + ratio * (route[i + 1].lat - route[i].lat);
+                        var xLng = route[i].lng + ratio * (route[i + 1].lng - route[i].lng);
+                        L.marker([xLat, xLng], { icon: L.divIcon({ className: 'x-marker', html: 'X' }) }).addTo(map);
+                        distanceFromStart += autonomyKm * 1000;
+                    }
+                    autonomyLeft += autonomyKm; // Incrementar autonomyLeft por autonomyKm
+                }
             }
         });
     </script>
