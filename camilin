@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página definitiva</title>
+    <link rel="stylesheet" href="styles2.css">
+
+    <!-- Leaflet CSS y JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <!-- Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+    <!-- Leaflet Marker Cluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="wrapper">
+            <div class="card-switch">
+                <label class="switch">
+                   <input type="checkbox" class="toggle" id="routeToggle" onchange="resetFilters()">
+                   <span class="slider"></span>
+                   <span class="card-side"></span>
+                   <div class="flip-card__inner">
+                      <div class="flip-card__front">
+                         <div class="title">Búsqueda</div>
+                         <form class="flip-card__form" action="">
+                            <label for="search-charger-filter">Tipo de Cargador:</label>
+                            <select id="search-charger-filter" class="flip-card__input">
+                                <option value="all">Todos</option>
+                                <option value="Level 1">Tipo 1</option>
+                                <option value="Level 2">Tipo 2</option>
+                                <option value="DC Fast">Tipo Fast</option>
+                            </select>
+                            <label for="search-power-filter">Acceso:</label>
+                            <select id="search-power-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="Public">Público</option>
+                              <option value="Private">Privado</option>
+                            </select>
+                            <label for="search-state-filter">Estado:</label>
+                            <select id="search-state-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="CDMX">CDMX</option>
+                              <option value="Morelos">Morelos</option>
+                            </select>
+                            <button type="button" class="flip-card__btn" id="search-button">Buscar</button>
+                         </form>
+                      </div>
+                      <div class="flip-card__back">
+                         <div class="title">Ruta</div>
+                         <form class="flip-card__form" action="">
+                            <label for="start-point">Punto de Inicio:</label>
+                            <input type="text" id="start-point" class="flip-card__input" placeholder="Ingrese el punto de inicio">
+                            <label for="end-point">Punto de Destino:</label>
+                            <input type="text" id="end-point" class="flip-card__input" placeholder="Ingrese el punto de destino">
+                            <button type="button" class="flip-card__btn" id="route-button">Buscar Ruta</button>
+                            <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
+                            <button type="button" class="flip-card__btn" id="clearMarkersButton">Eliminar Ruta</button>
+                            <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
+                         </form>
+                      </div>
+                   </div>
+                </label>
+             </div>
+        </div>
+    </div>
+    <div id="map"></div>
+
+    <script>
+        /// Inicialización del mapa (esto ya debe estar en tu archivo Camilo.html, mantenlo sin cambios)
+        const map = L.map('map').setView([37.0902, -95.7129], 4);
+
+        // Agregar capa de mapa base
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Control de Geocodificador
+        const geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            const bbox = e.geocode.bbox;
+            const poly = L.polygon([
+                bbox.getSouthEast(),
+                bbox.getNorthEast(),
+                bbox.getNorthWest(),
+                bbox.getSouthWest()
+            ]).addTo(map);
+            map.fitBounds(poly.getBounds());
+        })
+        .addTo(map);
+
+        // Agrupador de marcadores
+        const markers = L.markerClusterGroup();
+
+        // Ejemplo de agregación de marcadores con diferentes filtros
+        const exampleMarkers = [
+            { lat: 19.432608, lng: -99.133209, charger: 'Level 1', access: 'Public', state: 'CDMX' },
+            { lat: 19.432701, lng: -99.134216, charger: 'Level 2', access: 'Private', state: 'CDMX' },
+            { lat: 18.918611, lng: -99.234167, charger: 'DC Fast', access: 'Public', state: 'Morelos' },
+            // Agrega más marcadores según sea necesario
+        ];
+
+        exampleMarkers.forEach(markerData => {
+            const marker = L.marker([markerData.lat, markerData.lng]);
+            marker.bindPopup(`<b>Tipo de Cargador:</b> ${markerData.charger}<br><b>Acceso:</b> ${markerData.access}<br><b>Estado:</b> ${markerData.state}`);
+            marker.addTo(markers);
+        });
+
+        map.addLayer(markers);
+
+        // Función de búsqueda
+        document.getElementById('search-button').addEventListener('click', function() {
+            const chargerType = document.getElementById('search-charger-filter').value;
+            const accessType = document.getElementById('search-power-filter').value;
+            const state = document.getElementById('search-state-filter').value;
+
+            markers.clearLayers();
+
+            exampleMarkers.forEach(markerData => {
+                if (
+                    (chargerType === 'all' || markerData.charger === chargerType) &&
+                    (accessType === 'all' || markerData.access === accessType) &&
+                    (state === 'all' || markerData.state === state)
+                ) {
+                    const marker = L.marker([markerData.lat, markerData.lng]);
+                    marker.bindPopup(`<b>Tipo de Cargador:</b> ${markerData.charger}<br><b>Acceso:</b> ${markerData.access}<br><b>Estado:</b> ${markerData.state}`);
+                    marker.addTo(markers);
+                }
+            });
+
+            map.addLayer(markers);
+        });
+
+        // Control de ruta
+        const routingControl = L.Routing.control({
+            waypoints: [],
+            routeWhileDragging: true,
+            geocoder: L.Control.Geocoder.nominatim()
+        }).addTo(map);
+
+        document.getElementById('route-button').addEventListener('click', function() {
+            const startPoint = document.getElementById('start-point').value;
+            const endPoint = document.getElementById('end-point').value;
+
+            geocoder.geocode(startPoint, function(results) {
+                const startLatLng = results[0].center;
+
+                geocoder.geocode(endPoint, function(results) {
+                    const endLatLng = results[0].center;
+
+                    routingControl.setWaypoints([startLatLng, endLatLng]);
+                });
+            });
+        });
+
+        document.getElementById('removeStopsButton').addEventListener('click', function() {
+            routingControl.setWaypoints([]);
+        });
+
+        document.getElementById('clearMarkersButton').addEventListener('click', function() {
+            markers.clearLayers();
+            routingControl.setWaypoints([]);
+        });
+
+        document.getElementById('changeAutonomyButton').addEventListener('click', function() {
+            const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
+            // Aquí puedes añadir la lógica para manejar la nueva autonomía
+        });
+
+        // Función para reiniciar los filtros de búsqueda cuando se cambia el estado del toggle
+        function resetFilters() {
+            document.getElementById('search-charger-filter').value = 'all';
+            document.getElementById('search-power-filter').value = 'all';
+            document.getElementById('search-state-filter').value = 'all';
+        }
+
+    </script>
+</body>
+</html>
