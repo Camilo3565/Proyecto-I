@@ -51,7 +51,7 @@
                               <option value="CDMX">CDMX</option>
                               <option value="Morelos">Morelos</option>
                             </select>
-                            <button type="button" class="flip-card__btn" id="search-button">Buscar</button>
+                            <button type="button" class="flip-card__btn" id="search-button" style="visibility: hidden;">Buscar</button>
                          </form>
                       </div>
                       <div class="flip-card__back">
@@ -62,6 +62,9 @@
                             <label for="end-point">Punto de Destino:</label>
                             <input type="text" id="end-point" class="flip-card__input" placeholder="Ingrese el punto de destino">
                             <button type="button" class="flip-card__btn" id="route-button">Buscar Ruta</button>
+                            <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
+                            <button type="button" class="flip-card__btn" id="clearMarkersButton">Eliminar Ruta</button>
+                            <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
                          </form>
                       </div>
                    </div>
@@ -73,7 +76,7 @@
 
     <script>
         // Inicialización del mapa
-        const map = L.map('map').setView([19.432608, -99.133209], 10);
+        const map = L.map('map').setView([37.0902, -95.7129], 4);
 
         // Agregar capa de mapa base
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -172,6 +175,7 @@
                 map.removeControl(routingControl);
             }
         });
+        
     </script>
 </body>
 </html>
