@@ -51,17 +51,12 @@
                               <option value="CDMX">CDMX</option>
                               <option value="Morelos">Morelos</option>
                             </select>
-                            <button type="button" class="flip-card__btn" id="search-button" style="visibility: hidden;">Buscar</button>
+                            <button type="button" class="flip-card__btn" id="search-button">Buscar</button>
                          </form>
                       </div>
                       <div class="flip-card__back">
                          <div class="title">Ruta</div>
                          <form class="flip-card__form" action="">
-                            <label for="start-point">Punto de Inicio:</label>
-                            <input type="text" id="start-point" class="flip-card__input" placeholder="Ingrese el punto de inicio">
-                            <label for="end-point">Punto de Destino:</label>
-                            <input type="text" id="end-point" class="flip-card__input" placeholder="Ingrese el punto de destino">
-                            <button type="button" class="flip-card__btn" id="route-button">Buscar Ruta</button>
                             <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
                             <button type="button" class="flip-card__btn" id="clearMarkersButton">Eliminar Ruta</button>
                             <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
@@ -75,7 +70,7 @@
     <div id="map"></div>
 
     <script>
-        // Inicialización del mapa
+        /// Inicialización del mapa (esto ya debe estar en tu archivo Camilo.html, mantenlo sin cambios)
         const map = L.map('map').setView([37.0902, -95.7129], 4);
 
         // Agregar capa de mapa base
@@ -148,34 +143,42 @@
             geocoder: L.Control.Geocoder.nominatim()
         }).addTo(map);
 
-        // Función para buscar ruta
         document.getElementById('route-button').addEventListener('click', function() {
             const startPoint = document.getElementById('start-point').value;
             const endPoint = document.getElementById('end-point').value;
 
-            routingControl.spliceWaypoints(0, routingControl.getWaypoints().length, 
-                L.latLng(19.432608, -99.133209), 
-                L.latLng(19.432701, -99.134216)
-            );
-
-            L.Control.Geocoder.nominatim().geocode(startPoint, function(results) {
+            geocoder.geocode(startPoint, function(results) {
                 const startLatLng = results[0].center;
-                L.Control.Geocoder.nominatim().geocode(endPoint, function(results) {
+
+                geocoder.geocode(endPoint, function(results) {
                     const endLatLng = results[0].center;
+
                     routingControl.setWaypoints([startLatLng, endLatLng]);
                 });
             });
         });
 
-        // Ocultar/Mostrar el control de ruta según el estado del interruptor
-        document.getElementById('routeToggle').addEventListener('change', function() {
-            if (this.checked) {
-                routingControl.addTo(map);
-            } else {
-                map.removeControl(routingControl);
-            }
+        document.getElementById('removeStopsButton').addEventListener('click', function() {
+            routingControl.setWaypoints([]);
         });
-        
+
+        document.getElementById('clearMarkersButton').addEventListener('click', function() {
+            markers.clearLayers();
+            routingControl.setWaypoints([]);
+        });
+
+        document.getElementById('changeAutonomyButton').addEventListener('click', function() {
+            const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
+            // Aquí puedes añadir la lógica para manejar la nueva autonomía
+        });
+
+        // Función para reiniciar los filtros de búsqueda cuando se cambia el estado del toggle
+        function resetFilters() {
+            document.getElementById('search-charger-filter').value = 'all';
+            document.getElementById('search-power-filter').value = 'all';
+            document.getElementById('search-state-filter').value = 'all';
+        }
+
     </script>
 </body>
 </html>
