@@ -76,6 +76,12 @@
                             <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
                             <div id="timeCounter" class="control-button">Tiempo acumulado: 0h</div>
                             <div id="chargingInterval" class="control-button">Intervalo de tiempo de carga</div>
+                            <div id="reloadRouteContainer", style="background-color: white;">
+                                <button type="button" id="reloadRouteButton">
+                                    <img src="C:\Users\Nacho\OneDrive\Desktop\159657.png" alt="Recargar Ruta">
+                                </button>
+                            </div>
+                            
                          </form>
                       </div>
                    </div>
@@ -86,14 +92,15 @@
     <div id="map"></div>
 
     <script>
+    
         // Initialize the map
         const map = L.map('map').setView([37.0902, -95.7129], 4);
-    
+
         // Add base map layer
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
-    
+
         // Add geocoder control
         const geocoder = L.Control.geocoder({
             defaultMarkGeocode: false
@@ -109,33 +116,38 @@
             map.fitBounds(poly.getBounds());
         })
         .addTo(map);
-    
+
         // Add marker cluster group
         const markers = L.markerClusterGroup();
-    
+
         // Example markers (you can modify this with actual data)
         const exampleMarkers = [
             { lat: 19.432608, lng: -99.133209, charger: 'Level 1', access: 'Public', state: 'CDMX' },
             { lat: 19.432701, lng: -99.134216, charger: 'Level 2', access: 'Private', state: 'CDMX' },
             { lat: 18.918611, lng: -99.234167, charger: 'DC Fast', access: 'Public', state: 'Morelos' }
         ];
-    
+
         exampleMarkers.forEach(markerData => {
-            const marker = L.marker([markerData.lat, markerData.lng]);
+            const marker = L.marker([markerData.lat, markerData.lng], {
+                icon: L.icon({
+                    iconUrl: 'file:///C:/Users/Nacho/Downloads/electric-station-fuel-svgrepo-com.svg', 
+                    iconSize: [32, 32]
+                })
+            });
             marker.bindPopup(`<b>Tipo de Cargador:</b> ${markerData.charger}<br><b>Acceso:</b> ${markerData.access}<br><b>Estado:</b> ${markerData.state}`);
             marker.addTo(markers);
         });
-    
+
         map.addLayer(markers);
-    
+
         // Function to handle search
         document.getElementById('search-button').addEventListener('click', function() {
             const chargerType = document.getElementById('search-charger-filter').value;
             const accessType = document.getElementById('search-power-filter').value;
             const state = document.getElementById('search-state-filter').value;
-    
+
             markers.clearLayers();
-    
+
             exampleMarkers.forEach(markerData => {
                 if (
                     (chargerType === 'all' || markerData.charger === chargerType) &&
@@ -147,22 +159,35 @@
                     marker.addTo(markers);
                 }
             });
-    
+
             map.addLayer(markers);
         });
-    
-        // Add routing control
+        
+
+// Agregar el control de enrutamiento con la opción showAlternatives habilitada y estilos personalizados
         const routingControl = L.Routing.control({
             waypoints: [],
             routeWhileDragging: true,
-            geocoder: L.Control.Geocoder.nominatim()
+            geocoder: L.Control.Geocoder.nominatim(),
+            showAlternatives: true,
+            altLineOptions: {
+                styles: [
+                    { color: 'blue', opacity: 0.4, weight: 3, dashArray: '5,10' } // Estilo para las rutas alternativas (línea discontinua azul)
+                ]
+            },
+            lineOptions: {
+                styles: [
+                    { color: 'red', opacity: 0.6, weight: 3 } // Estilo para la ruta principal (línea continua verde)
+                ]
+            }
         }).addTo(map);
-    
+
+
         document.getElementById('removeStopsButton').addEventListener('click', function() {
             const waypoints = routingControl.getWaypoints();
             routingControl.setWaypoints([waypoints[0], waypoints[waypoints.length - 1]]);
         });
-    
+
         document.getElementById('clearMarkersButton').addEventListener('click', function() {
             routingControl.setWaypoints([]);
             map.eachLayer(function(layer) {
@@ -171,41 +196,104 @@
                 }
             });
             map.setView([37.0902, -95.7129], 4);
-            
         });
-    
+
+        let autonomyValue = null;
+
         document.getElementById('changeAutonomyButton').addEventListener('click', function() {
-            const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
-            if (autonomy !== null) {
-                alert("Has ingresado una autonomía de " + autonomy + " kilómetros.");
-                const selectedChargerType = document.getElementById('search-charger-filter').value;
-                if (selectedChargerType === 'all') {
-                    alert('Seleccione un tipo para obtener una estimación precisa del tiempo de carga.');
+            if (autonomyValue !== null) {
+                // Si el valor de la autonomía no está definido, solicitar al usuario el nuevo valor
+                const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
+                if (autonomy !== null) {
+                    // Convertir el valor de la autonomía a un número
+                    const newAutonomy = parseFloat(autonomy);
+                    if (!isNaN(newAutonomy) && newAutonomy > 0) {
+                        autonomyValue = newAutonomy; // Almacenar el valor de la autonomía
+                    } else {
+                        alert("Por favor, ingrese un valor válido para la autonomía.");
+                        return; // Salir de la función si el valor de la autonomía no es válido
+                    }
+                } else {
+                    return; // Salir de la función si el usuario cancela
                 }
             }
+
+            // Recalcular la ruta con el valor almacenado de la autonomía
+            const waypoints = routingControl.getWaypoints();
+            if (waypoints.length >= 2) {
+                const waypointsLatLngs = waypoints.map(waypoint => waypoint.latLng);
+                const routingOptions = {
+                    waypoints: waypointsLatLngs,
+                    routeWhileDragging: true,
+                    geocoder: L.Control.Geocoder.nominatim()
+                };
+                routingControl.setWaypoints([]);
+                routingControl.setWaypoints(waypointsLatLngs);
+
+                // Calcular y mostrar las X en la ruta
+                calculateAndShowXMarkers(autonomyValue);
+
+                // Actualizar el tiempo acumulado y el intervalo de tiempo de carga
+                updateAccumulatedTimeAndChargingInterval(autonomyValue);
+            } else {
+                alert("Debe haber al menos dos puntos de ruta para calcular la autonomía.");
+            }
         });
-    
-        // Function to reset filters
-        function resetFilters() {
-            document.getElementById('search-charger-filter').value = 'all';
-            document.getElementById('search-power-filter').value = 'all';
-            document.getElementById('search-state-filter').value = 'all';
-        }
-    
-        routingControl.on('routesfound', function(e) {
+
+        
+        
+
+        function updateAccumulatedTimeAndChargingInterval(autonomy) {
+            // Calcular el tiempo acumulado y el intervalo de tiempo de carga
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+
             let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    accumulatedTime += chargeTimes['DC Fast'];
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+                }
+            });
+
+            // Actualizar los elementos HTML con los nuevos valores
+            document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + minTime + "h - " + maxTime + "h]";
+        }
+
+
+        routingControl.on('routesfound', function(e) {
+            
+            let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
             const autonomyKm = parseFloat(prompt("Ingrese la autonomía en kilómetros:", "100"));
-    
+            const selectedChargerType = document.getElementById('search-charger-filter').value;
+
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+
+            const defaultChargeTime = chargeTimes[selectedChargerType] || 0;
+
             map.eachLayer(function(layer) {
                 if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
                     map.removeLayer(layer);
                 }
             });
-    
+
             const route = e.routes[0].coordinates;
             let autonomyLeft = autonomyKm;
-            const selectedChargerType = document.getElementById('search-charger-filter').value;
-            const filterDefault = selectedChargerType === 'all';
 
             for (let i = 0; i < route.length - 1; i++) {
                 const distance = route[i].distanceTo(route[i + 1]);
@@ -217,12 +305,54 @@
                     const xLng = route[i].lng + ratio * (route[i + 1].lng - route[i].lng);
                     L.marker([xLat, xLng], { icon: L.divIcon({ className: 'x-marker', html: 'X' }) }).addTo(map);
 
-                    autonomyLeft += autonomyKm; // Incrementar autonomyLeft por autonomyKm
+                    accumulatedTime += defaultChargeTime;
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+
+                    autonomyLeft += autonomyKm;
                 }
             }
 
             document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + maxTime + "h - " + minTime + "h]";
         });
-    </script>    
+        function reloadRoute() {
+    
+            const selectedChargerType = document.getElementById('search-charger-filter').value;
+
+            // Calcular el tiempo de carga basado en el tipo de cargador
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+            const defaultChargeTime = chargeTimes[selectedChargerType] || 0;
+
+            // Calcular el tiempo acumulado y el intervalo de tiempo de carga
+            let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
+            // Recorrer los marcadores y actualizar el tiempo acumulado
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    accumulatedTime += defaultChargeTime;
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+                }
+            });
+
+            // Actualizar los elementos HTML con los nuevos valores
+            document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + maxTime + "h - " + minTime + "h]";
+        }
+
+        document.getElementById('reloadRouteButton').addEventListener('click', reloadRoute);
+
+        
+
+           
+    </script>
+
 </body>
 </html>
