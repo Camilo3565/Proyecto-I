@@ -57,6 +57,11 @@
                       <div class="flip-card__back">
                          <div class="title">Ruta</div>
                          <form class="flip-card__form" action="">
+                            <label for="start-point">Punto de Inicio:</label>
+                            <input type="text" id="start-point" class="flip-card__input" placeholder="Ingrese el punto de inicio">
+                            <label for="end-point">Punto de Destino:</label>
+                            <input type="text" id="end-point" class="flip-card__input" placeholder="Ingrese el punto de destino">
+                            <button type="button" class="flip-card__btn" id="route-button">Buscar Ruta</button>
                             <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
                             <button type="button" class="flip-card__btn" id="clearMarkersButton">Eliminar Ruta</button>
                             <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
@@ -70,7 +75,10 @@
     <div id="map"></div>
 
     <script>
-        /// Inicialización del mapa (esto ya debe estar en tu archivo Camilo.html, mantenlo sin cambios)
+        // Solicitar la autonomía al iniciar el código
+        let autonomy = prompt('Ingrese la autonomía en kilómetros:');
+
+        // Inicialización del mapa
         const map = L.map('map').setView([37.0902, -95.7129], 4);
 
         // Agregar capa de mapa base
@@ -140,8 +148,43 @@
         const routingControl = L.Routing.control({
             waypoints: [],
             routeWhileDragging: true,
-            geocoder: L.Control.Geocoder.nominatim()
+            geocoder: L.Control.Geocoder.nominatim(),
+            lineOptions: {
+                styles: [{ color: 'blue', weight: 4 }]
+            }
         }).addTo(map);
+
+        routingControl.on('routesfound', function(e) {
+            accumulatedTime = 0; // Reiniciar el tiempo acumulado cada vez que se establece una nueva ruta
+
+            // Remover las marcas existentes antes de agregar las nuevas
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
+
+            var route = e.routes[0].coordinates;
+            var autonomyKm = parseFloat(autonomy);
+            var autonomyLeft = autonomyKm;
+
+            for (var i = 0; i < route.length - 1; i++) {
+                var distance = route[i].distanceTo(route[i + 1]);
+                autonomyLeft -= distance / 1000;
+
+                if (autonomyLeft <= 20) {
+                    var distanceFromStart = 0;
+                    while (distanceFromStart < autonomyKm * 1000) {
+                        var ratio = distanceFromStart / (autonomyKm * 1000);
+                        var xLat = route[i].lat + ratio * (route[i + 1].lat - route[i].lat);
+                        var xLng = route[i].lng + ratio * (route[i + 1].lng - route[i].lng);
+                        L.marker([xLat, xLng], { icon: L.divIcon({ className: 'x-marker', html: 'X' }) }).addTo(map);
+                        distanceFromStart += autonomyKm * 1000;
+                    }
+                    autonomyLeft += autonomyKm; // Incrementar autonomyLeft por autonomyKm
+                }
+            }
+        });
 
         document.getElementById('route-button').addEventListener('click', function() {
             const startPoint = document.getElementById('start-point').value;
@@ -149,27 +192,28 @@
 
             geocoder.geocode(startPoint, function(results) {
                 const startLatLng = results[0].center;
-
                 geocoder.geocode(endPoint, function(results) {
                     const endLatLng = results[0].center;
-
                     routingControl.setWaypoints([startLatLng, endLatLng]);
                 });
             });
         });
 
         document.getElementById('removeStopsButton').addEventListener('click', function() {
-            routingControl.setWaypoints([]);
+            // Eliminar todas las paradas marcadas
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
         });
 
         document.getElementById('clearMarkersButton').addEventListener('click', function() {
-            markers.clearLayers();
             routingControl.setWaypoints([]);
         });
 
         document.getElementById('changeAutonomyButton').addEventListener('click', function() {
-            const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
-            // Aquí puedes añadir la lógica para manejar la nueva autonomía
+            autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
         });
 
         // Función para reiniciar los filtros de búsqueda cuando se cambia el estado del toggle
@@ -180,5 +224,160 @@
         }
 
     </script>
+    <style>
+        .x-marker {
+            color: red;
+            font-size: 20px;
+            font-weight: bold;
+            background-color: white;
+            border-radius: 50%;
+            padding: 2px;
+        }
+
+        #map {
+            height: 500px;
+        }
+
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card-switch {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            perspective: 1000px;
+        }
+
+        .flip-card__inner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flip-card__inner.flip {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card__front, .flip-card__back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+        }
+
+        .flip-card__front {
+            background-color: #bbb;
+            color: black;
+        }
+
+        .flip-card__back {
+            background-color: #2980b9;
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .title {
+            font-size: 24px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .flip-card__form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .flip-card__input {
+            margin-bottom: 10px;
+            padding: 10px;
+            width: 80%;
+        }
+
+        .flip-card__btn {
+            margin-top: 10px;
+            padding: 10px;
+            width: 80%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .flip-card__btn:hover {
+            background-color: #45a049;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .card-side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 34px;
+            background-color: #4CAF50;
+        }
+
+        .card-side.flip {
+            transform: rotateY(180deg);
+        }
+
+    </style>
 </body>
 </html>
