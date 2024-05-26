@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <!-- basic -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <!-- mobile metas -->
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <!-- site metas -->
+      <title>limelight</title>
+      <meta name="keywords" content="">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <!-- bootstrap css -->
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <!-- style css -->
+      <link rel="stylesheet" href="css/style.css">
+      <!-- Responsive-->
+      <link rel="stylesheet" href="css/responsive.css">
+      <!-- fevicon -->
+      <link rel="icon" href="images/fevicon.png" type="image/gif" />
+      <!-- Scrollbar Custom CSS -->
+      <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css">
+      <!-- Tweaks for older IEs-->
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      <!-- styles2.css -->
+      <link rel="stylesheet" href="styles2.css">
+      <!-- Leaflet CSS y JavaScript -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"/>
+      <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+      <!-- Leaflet Routing Machine -->
+      <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+      <!-- Leaflet Control Geocoder -->
+      <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+      <!-- Leaflet Marker Cluster -->
+      <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+      <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+      <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+      <style>
+          /* CSS adicional para el botón de instrucciones */
+          #reloadRouteButton {
+              background-color: white;
+              border: none;
+              width: 40px;
+              height: 40px;
+          }
+          #reloadRouteButton img {
+              width: 100%;
+              height: 100%;
+          }
+      </style>
+   </head>
+   <body class="main-layout in_page">
+      <!-- loader  -->
+      <div class="loader_bg">
+         <div class="loader"><img src="images/loading.gif" alt="#"/></div>
+      </div>
+      <!-- end loader -->
+      <!-- header -->
+      <header>
+         <!-- header inner -->
+         <div class="header">
+            <div class="container">
+               <div class="row">
+                  <div class="col-md-12 col-sm-3 col logo_section">
+                     <div class="full">
+                        <div class="center-desk">
+                           <div class="logo">
+                              <a href="index.html"><img src="images/logo.png" alt="#" /></a>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-10 offset-md-1">
+                     <nav class="navigation navbar navbar-expand-md navbar-dark ">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarsExample04">
+                           <ul class="navbar-nav mr-auto">
+                              <li class="nav-item ">
+                                 <a class="nav-link" href="inicio.html">Inicio</a>
+                              </li>
+                              <li class="nav-item active">
+                                 <a class="nav-link" href="mapa.html">Mapa</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="recomendaciones.html">Recomendaciones</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="actualidad.html"> Actualidad </a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="contactanos.html">Contáctanos</a>
+                              </li>
+                           </ul>
+                        </div>
+                     </nav>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </header>
+      <!-- end header inner -->
+      <!--  service -->
+      <div class="container">
+         <div class="wrapper">
+            <div class="card-switch">
+               <label class="switch">
+                  <input type="checkbox" class="toggle" id="routeToggle" onchange="resetFilters()">
+                  <span class="slider"></span>
+                  <span class="card-side"></span>
+                  <div class="flip-card__inner">
+                     <div class="flip-card__front">
+                        <div class="title">Búsqueda</div>
+                        <form class="flip-card__form" action="">
+                           <label for="search-charger-filter">Tipo de Cargador:</label>
+                           <select id="search-charger-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="Level 1">Tipo 1</option>
+                              <option value="Level 2">Tipo 2</option>
+                              <option value="DC Fast">Tipo Fast</option>
+                           </select>
+                           <label for="search-power-filter">Acceso:</label>
+                           <select id="search-power-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="Public">Público</option>
+                              <option value="Private">Privado</option>
+                           </select>
+                           <label for="search-state-filter">Estado:</label>
+                           <select id="search-state-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="AB">Alberta</option>
+                              <option value="AK">Alaska</option>
+                              <option value="AL">Alabama</option>
+                              <!-- Agregar más opciones de estado si es necesario -->
+                           </select>
+                        </form>
+                     </div>
+                     <div class="flip-card__back">
+                        <div class="title">Ruta</div>
+                        <form class="flip-card__form" action="">
+                           <label for="route-charger-filter">Tipo de Cargador:</label>
+                           <select id="route-charger-filter" class="flip-card__input">
+                              <option value="all">Todos</option>
+                              <option value="Level 1">Tipo 1</option>
+                              <option value="Level 2">Tipo 2</option>
+                              <option value="DC Fast">Tipo Fast</option>
+                           </select>
+                           <button type="button" id="clearMarkersButton" class="flip-card__btn">Eliminar ruta</button>
+                           <button type="button" id="removeStopsButton" class="flip-card__btn">Eliminar paradas</button>
+                           <button type="button" id="changeAutonomyButton" class="flip-card__btn">Cambiar autonomía</button>
+                           <div id="reloadRouteContainer" class="control-button">
+                              <button type="button" id="reloadRouteButton" style="background-color: white; border: none;">
+                                 <img src="C:/Users/Nacho/OneDrive/Desktop/159657.png" alt="Recargar Ruta">
+                              </button>
+                           </div>
+                        </form>
+                     </div>
+                  </div>
+               </label>
+            </div>
+         </div>
+      </div>
+      <div id="map" style="position: absolute; top: 10px; right: 10px; height: calc(100vh - 20px); width: calc(100vw - 510px);"></div>
+      <div id="geocoder-container"></div>
+      <script>
+         var map = L.map('map').setView([37.0902, -95.7129], 4);
+         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+         }).addTo(map);
+         
+         var control = L.Routing.control({
+             waypoints: [
+                 L.latLng(37.0902, -95.7129),
+                 L.latLng(40.7128, -74.0060)
+             ],
+             routeWhileDragging: true,
+             geocoder: L.Control.Geocoder.nominatim(),
+             createMarker: function() { return null; }
+         }).addTo(map);
+
+         document.getElementById('reloadRouteButton').onclick = function() {
+             control.getPlan().setWaypoints([]);
+         };
+      </script>
+      <!-- Javascript files-->
+      <script src="js/jquery.min.js"></script>
+      <script src="js/popper.min.js"></script>
+      <script src="js/bootstrap.bundle.min.js"></script>
+      <script src="js/jquery-3.0.0.min.js"></script>
+      <script src="js/plugin.js"></script>
+      <!-- sidebar -->
+      <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+      <script src="js/custom.js"></script>
+      <!-- Google Map js -->
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnfgoyrGkEYQkdtPGYRIeQqMwzDlpFAos&callback=initMap"></script>
+      <!--  footer -->
+      <footer>
+         <div class="footer">
+            <div class="container">
+               <div class="row">
+                  <div class=" col-md-3 col-sm-6">
+                     <ul class="social_icon">
+                        <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                     </ul>
+                     
+                  </div>
+                  <div class=" col-md-3 col-sm-6">
+                     <h3>Tienes dudas? </h3>
+                     <p  class="variat pad_roght2">No te lo pienses
+                        y envianos un mensaje, 
+                        estaremos dispuestos a 
+                        ayudarte
+                     </p>
+                  </div>
+                  <div class="col-md-3 col-sm-6">
+                     <h3>Nuestros Servicios</h3>
+                     <ul class="link_menu">
+                        <li><a href="inicio.html">Inicio</a></li>
+                        
+                        <li><a href="mapa.html">Mapa</a></li>
+                        <li><a href="recomendaciones.html">Recomendaciones</a></li>
+                        <li><a href="testimonial.html">Actualidad</a></li>
+                        <li><a href="contact.html">Contactanos</a></li>
+                     </ul>
+                  </div>
+                  <div class="col-md-3 col-sm-6">
+                     <h3>Nuestro Diseño</h3>
+                     <p  class="variat">Esperemos que
+                        os guste nuestra página
+                        web, estamos atentos 
+                        a los mensajes
+               
+               
+                     </p>
+                  </div>
+                  <div class="col-md-6 offset-md-6">
+                     <form id="hkh" class="bottom_form">
+                        <input class="enter" placeholder="Introduce tu correo" type="text" name="Introduce tu correo">
+                        <button class="sub_btn">Siguenos!</button>
+                     </form>
+                  </div>
+               </div>
+            </div>
+            
+            
+         </div>
+      </footer>
+      <!-- end footer -->
+      <!-- Javascript files-->
+      <script src="js/jquery.min.js"></script>
+      <script src="js/bootstrap.bundle.min.js"></script>
+      <script src="js/jquery-3.0.0.min.js"></script>
+      <!-- sidebar -->
+      <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+      <script src="js/custom.js"></script>
+   </body>
+</html>
