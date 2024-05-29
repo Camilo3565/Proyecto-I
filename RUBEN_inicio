@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <!-- basic -->
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <!-- mobile metas -->
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="viewport" content="initial-scale=1, maximum-scale=1">
+      <!-- site metas -->
+      <title>limelight</title>
+      <meta name="keywords" content="">
+      <meta name="description" content="">
+      <meta name="author" content="">
+      <!-- bootstrap css -->
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      <!-- style css -->
+      <link rel="stylesheet" href="css/style.css">
+      <!-- Responsive-->
+      <link rel="stylesheet" href="css/responsive.css">
+      <!-- fevicon -->
+      <link rel="icon" href="images/fevicon.png" type="image/gif" />
+      <!-- Scrollbar Custom CSS -->
+      <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css">
+      <!-- Tweaks for older IEs-->
+      <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+      <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+   </head>
+   <!-- body -->
+   <body class="main-layout">
+      <!-- loader  -->
+      <div class="loader_bg">
+         <div class="loader"><img src="images/loading.gif" alt="#"/></div>
+      </div>
+      <!-- end loader -->
+      <!-- header -->
+      <header>
+         <!-- header inner -->
+         <div class="header">
+            <div class="container">
+               <div class="row">
+                  <div class="col-md-12 col-sm-3 col logo_section">
+                     <div class="full">
+                        <div class="center-desk">
+                           <div class="logo">
+                              <a href="index.html"><img src="images/logo.png" alt="#" /></a>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+                  <div class="col-md-10 offset-md-1">
+                     <nav class="navigation navbar navbar-expand-md navbar-dark ">
+                        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse" id="navbarsExample04">
+                           <ul class="navbar-nav mr-auto">
+                              <li class="nav-item active">
+                                 <a class="nav-link" href="inicio.html">Inicio</a>
+                              </li>
+                              
+                              <li class="nav-item">
+                                 <a class="nav-link" href="mapa.html">Mapa</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="recomendaciones.html">Recomendaciones</a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="actualidad.html"> Actualidad  </a>
+                              </li>
+                              <li class="nav-item">
+                                 <a class="nav-link" href="contactanos.html">Contáctanos</a>
+                              </li>
+                           </ul>
+                        </div>
+                     </nav>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </header>
+      <!-- end header inner -->
+      <!-- end header -->
+      <!-- banner -->
+      <section class="banner_main">
+         <div id="myCarousel" class="carousel slide banner" data-ride="carousel">
+            <ol class="carousel-indicators">
+               <li data-target="#myCarousel" data-slide-to="0" class="active"></li>
+               <li data-target="#myCarousel" data-slide-to="1"></li>
+               <li data-target="#myCarousel" data-slide-to="2"></li>
+            </ol>
+            <div class="carousel-inner">
+               <div class="carousel-item active">
+                  <div class="container">
+                     <div class="carousel-caption relative">
+                        <div class="row">
+                           <div class="col-md-7 offset-md-5">
+                              <div class="text-bg">
+                                 <h1> El futuro <br> eléctrico</h1>
+                                 <span>Descubre las ventajas de los coches eléctricos</span>
+                                 
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="carousel-item">
+                  <div class="container">
+                     <div class="carousel-caption relative">
+                        <div class="row">
+                           <div class="col-md-7 offset-md-5">
+                              <div class="text-bg">
+                                 <h1> El futuro <br>eléctrico</h1>
+                                 <span>Descubre las ventajas de los coches eléctricos</span>
+                                 
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div class="carousel-item">
+                  <div class="container">
+                     <div class="carousel-caption relative">
+                        <div class="row">
+                           <div class="col-md-7 offset-md-5">
+                              <div class="text-bg">
+                                 <h1> El futuro <br>eléctrico</h1>
+                                 <span>Descubre las ventajas de los coches eléctricos</span>
+                                 
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            
+         </div>
+      </section>
+      <!-- end banner -->
+      <!-- about -->
+      <div id="about" class="about">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-5">
+                  <div class="titlepage">
+                     <h2>Nuestro <span class="green">Propósito</span></h2>
+                     <p>Nos gustaría que todos los usuarios que usan coches eléctricos se interesen en nuestros servicios, los cuáles les ayudarán a guiarse y buscar la estación de recarga óptima. Si aún no tienes uno, puedes descubrir si los coches eléctricos son para tí en esta página a partir de nuestros consejos recomendados por expertos en el sector.</p>
+                     
+                  </div>
+               </div>
+               <div class="col-md-7">
+                  <div class="about_img">
+                     <figure><img src="images/about.png" alt="#"/></figure>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- end about -->
+      
+      <!-- testimonial -->
+      <div id="testimonial" class="Testimonial">
+         <div class="container-fluid">
+            <div class="row d_flex">
+               <div class="col-md-8 pad_left0">
+                  <div id="testimon" class="carousel slide banner_testimonial" data-ride="carousel">
+                     <ol class="carousel-indicators">
+                        <li data-target="#testimon" data-slide-to="0" class="active"></li>
+                        <li data-target="#testimon" data-slide-to="1"></li>
+                        <li data-target="#testimon" data-slide-to="2"></li>
+                     </ol>
+                     <div class="carousel-inner">
+                        <div class="carousel-item active">
+                           <div class="container">
+                              <div class="carousel-caption relative">
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett1.png" alt="#"/></i>
+                                          <span>Víctor Lorenzo</span>
+                                          <p>Con mi nuevo Tesla serie S, me ha hecho falta una página web como esta, pensaba que no estaba desarrollada pero estos tipos lo han hecho y me he llevado una grata sorpresa. En mi empresa 'En Binario' todos usamos su mapa, nosotros también estamos concienciados con el planeta.</p>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett2.png" alt="#"/></i>
+                                          <span>Isaac Herranz</span>
+                                          <p>Estos tíos son unos genios, me encanta su página web y gracias a ellos he dado el salto del tractor que consume mucho a, por fin, un coche eléctrico.  Ahora solo me queda que mi suegra se cambie a un coche eléctrico para contaminar menos, aunque ella es mucho de dar la contraria.
+                     
+                                          </p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="carousel-item">
+                           <div class="container">
+                              <div class="carousel-caption relative">
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett1.png" alt="#"/></i>
+                                          <span>Víctor Lorenzo</span>
+                                          <p>Con mi nuevo Tesla serie S, me ha hecho falta una página web como esta, pensaba que no estaba desarrollada pero estos tipos lo han hecho y me he llevado una grata sorpresa. En mi empresa 'En Binario' todos usamos su mapa, nosotros también estamos concienciados con el planeta.</p>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett2.png" alt="#"/></i>
+                                          <span>Isaac Herranz</span>
+                                          <p>Estos tíos son unos genios, me encanta su página web y gracias a ellos he dado el salto del tractor que consume mucho a, por fin, un coche eléctrico. Ahora solo me queda que mi suegra se cambie a un coche eléctrico para contaminar menos, aunque ella es mucho de dar la contraria.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                        <div class="carousel-item">
+                           <div class="container">
+                              <div class="carousel-caption relative">
+                                 <div class="row">
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett1.png" alt="#"/></i>
+                                          <span>Víctor Lorenzo</span>
+                                          <p>Con mi nuevo Tesla serie S, me ha hecho falta una página web como esta, pensaba que no estaba desarrollada pero estos tipos lo han hecho y me he llevado una grata sorpresa. En mi empresa 'En Binario' todos usamos su mapa, nosotros también estamos concienciados con el planeta</p>
+                                       </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                       <div class="text_humai">
+                                          <i><img src="images/tett2.png" alt="#"/></i>
+                                          <span>Isaac Herranz</span>
+                                          <p>Estos tíos son unos genios, me encanta su página web y gracias a ellos he dado el salto del tractor que consume mucho a, por fin, un coche eléctrico. Ahora solo me queda que mi suegra se cambie a un coche eléctrico para contaminar menos, aunque ella es mucho de dar la contraria.</p>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                    
+                  </div>
+               </div>
+               <div class="col-md-4 ">
+                  <div class="titlepage">
+                     <h2>Testimonios</h2>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- end design -->
+      <!--  contact -->
+      <div id="contact" class="contact">
+         <div class="container">
+            <div class="row">
+               <div class="col-md-12">
+                  <div class="titlepage">
+                     <h2>Contáctanos</h2>
+                  </div>
+               </div>
+            </div>
+            <div class="row">
+               <div class="col-md-6">
+                  <form id="request" class="main_form">
+                     <div class="row">
+                        <div class="col-md-12 ">
+                           <input class="contactus" placeholder="Nombre" type="type" name="Nombre"> 
+                        </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Correo" type="type" name="Correo"> 
+                        </div>
+                        <div class="col-md-12">
+                           <input class="contactus" placeholder="Número de teléfono" type="type" name="Número de teléfono">                          
+                        </div>
+                        <div class="col-md-12">
+                           <textarea class="textarea" placeholder="Dudas" type="type" Message="Name">Dudas</textarea>
+                        </div>
+                        <div class="col-md-12">
+                           <button class="send_btn">Enviar</button>
+                        </div>
+                     </div>
+                  </form>
+               </div>
+               <div class="col-md-6">
+                  <div class="map_main">
+                     <div class="map-responsive">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3079.419675541915!2d-0.34941568858012034!3d39.48243717148659!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd604883326cd6c7%3A0xded925519ef13eaf!2sUPV%20-%20Escuela%20T%C3%A9cnica%20Superior%20de%20Ingenier%C3%ADa%20Inform%C3%A1tica%20ETSINF!5e0!3m2!1ses!2ses!4v1715240656997!5m2!1ses!2ses" width="600" height="450" style="border:0;" allowfullscreen="" ></iframe>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+      <!-- end contact -->
+      <!--  footer -->
+      <footer>
+         <div class="footer">
+            <div class="container">
+               <div class="row">
+                  <div class=" col-md-3 col-sm-6">
+                     <ul class="social_icon">
+                        <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                        <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                     </ul>
+                     
+                  </div>
+                  <div class=" col-md-3 col-sm-6">
+                     <h3>Tienes dudas? </h3>
+                     <p  class="variat pad_roght2">No te lo pienses
+                        y envianos un mensaje, 
+                        estaremos dispuestos a 
+                        ayudarte
+                     </p>
+                  </div>
+                  <div class="col-md-3 col-sm-6">
+                     <h3>Nuestros Servicios</h3>
+                     <ul class="link_menu">
+                        <li><a href="inicio.html">Inicio</a></li>
+                        
+                        <li><a href="mapa.html">Mapa</a></li>
+                        <li><a href="recomendaciones.html">Recomendaciones</a></li>
+                        <li><a href="testimonial.html">Actualidad</a></li>
+                        <li><a href="contact.html">Contactanos</a></li>
+                     </ul>
+                  </div>
+                  <div class="col-md-3 col-sm-6">
+                     <h3>Nuestro Diseño</h3>
+                     <p  class="variat">Esperemos que
+                        os guste nuestra página
+                        web, estamos atentos 
+                        a los mensajes
+               
+               
+                     </p>
+                  </div>
+                  <div class="col-md-6 offset-md-6">
+                     <form id="hkh" class="bottom_form">
+                        <input class="enter" placeholder="Introduce tu correo" type="text" name="Introduce tu correo">
+                        <button class="sub_btn">Siguenos!</button>
+                     </form>
+                  </div>
+               </div>
+            </div>
+            
+            
+         </div>
+      </footer>
+      <!-- end footer -->
+      <!-- Javascript files-->
+      <script src="js/jquery.min.js"></script>
+      <script src="js/bootstrap.bundle.min.js"></script>
+      <script src="js/jquery-3.0.0.min.js"></script>
+      <!-- sidebar -->
+      <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+      <script src="js/custom.js"></script>
+   </body>
+</html>
