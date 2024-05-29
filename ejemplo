@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- mobile metas -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- site metas -->
+    <title>Página definitiva</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- bootstrap css -->
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <!-- style css -->
+    <link rel="stylesheet" href="css/style.css">
+    <!-- Responsive-->
+    <link rel="stylesheet" href="css/responsive.css">
+    <!-- fevicon -->
+    <link rel="icon" href="images/fevicon.png" type="image/gif" />
+    <!-- Scrollbar Custom CSS -->
+    <link rel="stylesheet" href="css/jquery.mCustomScrollbar.min.css">
+    <!-- Tweaks for older IEs-->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css" media="screen">
+    <!-- styles2.css -->
+    <link rel="stylesheet" href="styles2.css">
+    <!-- Leaflet CSS y JavaScript -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+    <!-- Leaflet Routing Machine -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"/>
+    <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+    <!-- Leaflet Control Geocoder -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.css"/>
+    <script src="https://unpkg.com/leaflet-control-geocoder@1.13.0/dist/Control.Geocoder.js"></script>
+    <!-- Leaflet Marker Cluster -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css"/>
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+
+    <style>
+        .x-marker {
+            background-color: transparent;
+            color: rgb(0, 0, 0);
+            font-size: 16px;
+            text-align: center;
+            width: 10px;
+            height: 10px;
+            line-height: 20px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="main-layout in_page">
+    <!-- loader  -->
+    <div class="loader_bg">
+        <div class="loader"><img src="images/loading.gif" alt="#"/></div>
+    </div>
+    <!-- end loader -->
+    <!-- header -->
+    <header>
+        <!-- header inner -->
+        <div class="header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12 col-sm-3 col logo_section">
+                        <div class="full">
+                            <div class="center-desk">
+                                <div class="logo">
+                                    <a href="index.html"><img src="images/logo.png" alt="#" /></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-10 offset-md-1">
+                        <nav class="navigation navbar navbar-expand-md navbar-dark ">
+                            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExample04" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                            </button>
+                            <div class="collapse navbar-collapse" id="navbarsExample04">
+                                <ul class="navbar-nav mr-auto">
+                                    <li class="nav-item ">
+                                        <a class="nav-link" href="inicio.html">Inicio</a>
+                                    </li>
+                                    <li class="nav-item active">
+                                        <a class="nav-link" href="mapa.html">Mapa</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="recomendaciones.html">Recomendaciones</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="actualidad.html">Actualidad</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="contactanos.html">Contáctanos</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- end header inner -->
+
+    <div class="container">
+        <div class="wrapper">
+            <div class="card-switch">
+                <label class="switch">
+                    <input type="checkbox" class="toggle" id="routeToggle" onchange="resetFilters()">
+                    <span class="slider"></span>
+                    <span class="card-side"></span>
+                    <div class="flip-card__inner">
+                        <div class="flip-card__front">
+                            <div class="title">Búsqueda</div>
+                            <form class="flip-card__form" action="">
+                                <label for="search-charger-filter">Tipo de Cargador:</label>
+                                <select id="search-charger-filter" class="flip-card__input">
+                                    <option value="all">Todos</option>
+                                    <option value="Level 1">Tipo 1</option>
+                                    <option value="Level 2">Tipo 2</option>
+                                    <option value="DC Fast">Tipo Fast</option>
+                                </select>
+                                <label for="search-power-filter">Acceso:</label>
+                                <select id="search-power-filter" class="flip-card__input">
+                                    <option value="all">Todos</option>
+                                    <option value="Public">Público</option>
+                                    <option value="Private">Privado</option>
+                                </select>
+                                <label for="search-state-filter">Estado:</label>
+                                <select id="search-state-filter" class="flip-card__input">
+                                    <option value="all">Todos</option>
+                                    <option value="AL">Alabama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawái</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                    <option value="IA">Iowa</option>
+                                    <option value="KS">Kansas</option>
+                                    <option value="KY">Kentucky</option>
+                                    <option value="LA">Luisiana</option>
+                                    <option value="ME">Maine</option>
+                                    <option value="MD">Maryland</option>
+                                    <option value="MA">Massachusetts</option>
+                                    <option value="MI">Míchigan</option>
+                                    <option value="MN">Minnesota</option>
+                                    <option value="MS">Misisipi</option>
+                                    <option value="MO">Misuri</option>
+                                    <option value="MT">Montana</option>
+                                    <option value="NE">Nebraska</option>
+                                    <option value="NV">Nevada</option>
+                                    <option value="NH">Nuevo Hampshire</option>
+                                    <option value="NJ">Nueva Jersey</option>
+                                    <option value="NM">Nuevo México</option>
+                                    <option value="NY">Nueva York</option>
+                                    <option value="NC">Carolina del Norte</option>
+                                    <option value="ND">Dakota del Norte</option>
+                                    <option value="OH">Ohio</option>
+                                    <option value="OK">Oklahoma</option>
+                                    <option value="OR">Oregón</option>
+                                    <option value="PA">Pensilvania</option>
+                                    <option value="RI">Rhode Island</option>
+                                    <option value="SC">Carolina del Sur</option>
+                                    <option value="SD">Dakota del Sur</option>
+                                    <option value="TN">Tennessee</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="UT">Utah</option>
+                                    <option value="VT">Vermont</option>
+                                    <option value="VA">Virginia</option>
+                                    <option value="WA">Washington</option>
+                                    <option value="WV">Virginia Occidental</option>
+                                    <option value="WI">Wisconsin</option>
+                                    <option value="WY">Wyoming</option>
+                                </select>
+                                <button type="button" class="flip-card__btn" id="search-button">Buscar</button>
+                            </form>
+                        </div>
+                        <div class="flip-card__back">
+                            <div class="title">Ruta</div>
+                            <form class="flip-card__form" action="">
+                                <button type="button" class="flip-card__btn" id="removeStopsButton">Eliminar Paradas</button>
+                                <button type="button" class="flip-card__btn" id="clearMarkersButton">Eliminar Ruta</button>
+                                <button type="button" class="flip-card__btn" id="changeAutonomyButton">Cambiar autonomía</button>
+                                <div id="timeCounter" class="control-button">Tiempo acumulado: 0h</div>
+                                <div id="chargingInterval" class="control-button">Intervalo de tiempo de carga</div>
+                                <div id="reloadRouteContainer" style="background-color: white;">
+                                    <button type="button" id="reloadRouteButton">
+                                        <img src="image.png" alt="Recargar Ruta">
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <!--  footer -->
+    <footer>
+        <div class="footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3 col-sm-6">
+                        <ul class="social_icon">
+                            <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                            <li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <h3>Tienes dudas?</h3>
+                        <p class="variat pad_roght2">No te lo pienses y envíanos un mensaje, estaremos dispuestos a ayudarte</p>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <h3>Nuestros Servicios</h3>
+                        <ul class="link_menu">
+                            <li><a href="inicio.html">Inicio</a></li>
+                            <li><a href="mapa.html">Mapa</a></li>
+                            <li><a href="recomendaciones.html">Recomendaciones</a></li>
+                            <li><a href="testimonial.html">Actualidad</a></li>
+                            <li><a href="contact.html">Contáctanos</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3 col-sm-6">
+                        <h3>Nuestro Diseño</h3>
+                        <p class="variat">Esperemos que os guste nuestra página web, estamos atentos a los mensajes</p>
+                    </div>
+                    <div class="col-md-6 offset-md-6">
+                        <form id="hkh" class="bottom_form">
+                            <input class="enter" placeholder="Introduce tu correo" type="text" name="Introduce tu correo">
+                            <button class="sub_btn">Síguenos!</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- end footer -->
+    <!-- Javascript files-->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/bootstrap.bundle.min.js"></script>
+    <script src="js/jquery-3.0.0.min.js"></script>
+    <!-- sidebar -->
+    <script src="js/jquery.mCustomScrollbar.concat.min.js"></script>
+    <script src="js/custom.js"></script>
+
+    <script>
+        // Initialize the map
+        const map = L.map('map').setView([37.0902, -95.7129], 4);
+
+        // Add base map layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add geocoder control
+        const geocoder = L.Control.geocoder({
+            defaultMarkGeocode: false
+        })
+        .on('markgeocode', function(e) {
+            const bbox = e.geocode.bbox;
+            const poly = L.polygon([
+                bbox.getSouthEast(),
+                bbox.getNorthEast(),
+                bbox.getNorthWest(),
+                bbox.getSouthWest()
+            ]).addTo(map);
+            map.fitBounds(poly.getBounds());
+        })
+        .addTo(map);
+
+        // Add marker cluster group
+        const markers = L.markerClusterGroup();
+
+        // Example markers (you can modify this with actual data)
+        const exampleMarkers = [
+            // Add your marker data here
+        ];
+
+        exampleMarkers.forEach(markerData => {
+            const marker = L.marker([markerData.lat, markerData.lng], {
+                icon: L.icon({
+                    iconUrl: 'electric-station-fuel-svgrepo-com.svg', 
+                    iconSize: [32, 32]
+                })
+            });
+            marker.bindPopup(`<b>Tipo de Cargador:</b> ${markerData.charger}<br><b>Acceso:</b> ${markerData.access}<br><b>Estado:</b> ${markerData.state}`);
+            marker.addTo(markers);
+        });
+
+        map.addLayer(markers);
+
+        // Function to handle search
+        document.getElementById('search-button').addEventListener('click', function() {
+            const chargerType = document.getElementById('search-charger-filter').value;
+            const accessType = document.getElementById('search-power-filter').value;
+            const state = document.getElementById('search-state-filter').value;
+
+            markers.clearLayers();
+
+            exampleMarkers.forEach(markerData => {
+                if (
+                    (chargerType === 'all' || markerData.charger === chargerType) &&
+                    (accessType === 'all' || markerData.access === accessType) &&
+                    (state === 'all' || markerData.state === state)
+                ) {
+                    const marker = L.marker([markerData.lat, markerData.lng]);
+                    marker.bindPopup(`<b>Tipo de Cargador:</b> ${markerData.charger}<br><b>Acceso:</b> ${markerData.access}<br><b>Estado:</b> ${markerData.state}`);
+                    marker.addTo(markers);
+                }
+            });
+
+            map.addLayer(markers);
+        });
+
+        // Add routing control with showAlternatives enabled and custom styles
+        const routingControl = L.Routing.control({
+            waypoints: [],
+            routeWhileDragging: true,
+            geocoder: L.Control.Geocoder.nominatim(),
+            showAlternatives: true,
+            altLineOptions: {
+                styles: [
+                    { color: 'blue', opacity: 0.4, weight: 3, dashArray: '5,10' } // Style for alternative routes (blue dashed line)
+                ]
+            },
+            lineOptions: {
+                styles: [
+                    { color: 'red', opacity: 0.6, weight: 3 } // Style for main route (red solid line)
+                ]
+            }
+        }).addTo(map);
+
+        document.getElementById('removeStopsButton').addEventListener('click', function() {
+            const waypoints = routingControl.getWaypoints();
+            routingControl.setWaypoints([waypoints[0], waypoints[waypoints.length - 1]]);
+        });
+
+        document.getElementById('clearMarkersButton').addEventListener('click', function() {
+            routingControl.setWaypoints([]);
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
+            map.setView([37.0902, -95.7129], 4);
+        });
+
+        let autonomyValue = null;
+
+        document.getElementById('changeAutonomyButton').addEventListener('click', function() {
+            if (autonomyValue !== null) {
+                // If the autonomy value is not defined, prompt the user for the new value
+                const autonomy = prompt('Ingrese la nueva autonomía en kilómetros:');
+                if (autonomy !== null) {
+                    // Convert the autonomy value to a number
+                    const newAutonomy = parseFloat(autonomy);
+                    if (!isNaN(newAutonomy) && newAutonomy > 0) {
+                        autonomyValue = newAutonomy; // Store the autonomy value
+                    } else {
+                        alert("Por favor, ingrese un valor válido para la autonomía.");
+                        return; // Exit the function if the autonomy value is not valid
+                    }
+                } else {
+                    return; // Exit the function if the user cancels
+                }
+            }
+
+            // Recalculate the route with the stored autonomy value
+            const waypoints = routingControl.getWaypoints();
+            if (waypoints.length >= 2) {
+                const waypointsLatLngs = waypoints.map(waypoint => waypoint.latLng);
+                const routingOptions = {
+                    waypoints: waypointsLatLngs,
+                    routeWhileDragging: true,
+                    geocoder: L.Control.Geocoder.nominatim()
+                };
+                routingControl.setWaypoints([]);
+                routingControl.setWaypoints(waypointsLatLngs);
+
+                // Calculate and show the X markers on the route
+                calculateAndShowXMarkers(autonomyValue);
+
+                // Update the accumulated time and charging interval
+                updateAccumulatedTimeAndChargingInterval(autonomyValue);
+            } else {
+                alert("Debe haber al menos dos puntos de ruta para calcular la autonomía.");
+            }
+        });
+
+        function updateAccumulatedTimeAndChargingInterval(autonomy) {
+            // Calculate the accumulated time and charging interval
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+
+            let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    accumulatedTime += chargeTimes['DC Fast'];
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+                }
+            });
+
+            // Update the HTML elements with the new values
+            document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + minTime + "h - " + maxTime + "h]";
+        }
+
+        routingControl.on('routesfound', function(e) {
+            let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
+            const autonomyKm = parseFloat(prompt("Ingrese la autonomía en kilómetros:", "100"));
+            const selectedChargerType = document.getElementById('search-charger-filter').value;
+
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+
+            const defaultChargeTime = chargeTimes[selectedChargerType] || 0;
+
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    map.removeLayer(layer);
+                }
+            });
+
+            const route = e.routes[0].coordinates;
+            let autonomyLeft = autonomyKm;
+
+            for (let i = 0; i < route.length - 1; i++) {
+                const distance = route[i].distanceTo(route[i + 1]);
+                autonomyLeft -= distance / 1000;
+
+                while (autonomyLeft <= 20) {
+                    const ratio = (autonomyKm - autonomyLeft) / autonomyKm;
+                    const xLat = route[i].lat + ratio * (route[i + 1].lat - route[i].lat);
+                    const xLng = route[i].lng + ratio * (route[i + 1].lng - route[i].lng);
+                    L.marker([xLat, xLng], { icon: L.divIcon({ className: 'x-marker', html: 'X' }) }).addTo(map);
+
+                    accumulatedTime += defaultChargeTime;
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+
+                    autonomyLeft += autonomyKm;
+                }
+            }
+
+            document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + maxTime + "h - " + minTime + "h]";
+        });
+
+        function reloadRoute() {
+            const selectedChargerType = document.getElementById('search-charger-filter').value;
+
+            // Calculate the charging time based on the charger type
+            const chargeTimes = {
+                'Level 1': 8,
+                'Level 2': 4,
+                'DC Fast': 1
+            };
+            const defaultChargeTime = chargeTimes[selectedChargerType] || 0;
+
+            // Calculate the accumulated time and charging interval
+            let accumulatedTime = 0;
+            let minTime = 0;
+            let maxTime = 0;
+
+            // Iterate over the markers and update the accumulated time
+            map.eachLayer(function(layer) {
+                if (layer instanceof L.Marker && layer.options.icon && layer.options.icon.options.className === 'x-marker') {
+                    accumulatedTime += defaultChargeTime;
+                    minTime += chargeTimes['Level 1'];
+                    maxTime += chargeTimes['DC Fast'];
+                }
+            });
+
+            // Update the HTML elements with the new values
+            document.getElementById('timeCounter').innerText = "Tiempo acumulado: " + accumulatedTime + "h";
+            document.getElementById('chargingInterval').innerText = "Intervalo de tiempo de carga: [" + maxTime + "h - " + minTime + "h]";
+        }
+
+        document.getElementById('reloadRouteButton').addEventListener('click', reloadRoute);
+    </script>
+</body>
+</html>
